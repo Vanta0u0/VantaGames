@@ -30,8 +30,7 @@ function calcularTiempoReaccionEstimado(aciertos) {
     let min, max;
     
     if (aciertos > ACIERTOS_UMBRAL) {
-        // 🛑 Rango Rápido Extremo: De 90 ms a 110 ms
-        // Esto permite que los valores sean 100.00 ms o menos.
+        // Rango Rápido Extremo: De 90 ms a 110 ms
         min = 90;
         max = 110;
     } else {
@@ -47,7 +46,7 @@ function calcularTiempoReaccionEstimado(aciertos) {
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Elementos del DOM
+    // Elementos del DOM (Todos los IDs están siendo capturados aquí)
     const modalInicioJuego = document.querySelector('#modal-inicio-juego');
     const btnIniciar = document.querySelector('#btn-iniciar');
 
@@ -60,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainContainer = document.querySelector('#main-container'); 
 
     const modalFinJuego = document.querySelector('#modal-fin-juego');
-    const modalContenidoFin = document.querySelector('#modal-fin-juego .modal-contenido'); // Contenido del modal fin
+    const modalContenidoFin = document.querySelector('#modal-fin-juego .modal-contenido'); 
     const finalAciertosDisplay = document.querySelector('#final-aciertos');
     const finalFallosDisplay = document.querySelector('#final-fallos');
     const btnReiniciar = document.querySelector('#btn-reiniciar');
@@ -166,15 +165,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Calcular el tiempo de reacción estimado
         const tiempoEstimadoString = calcularTiempoReaccionEstimado(aciertos);
-        const tiempoEstimadoNumber = parseFloat(tiempoEstimadoString); // Convertir a número para la comparación
+        const tiempoEstimadoNumber = parseFloat(tiempoEstimadoString); 
 
-        // 🛑 LÓGICA DE CIERRE AUTOMÁTICO
+        // LÓGICA DE CIERRE AUTOMÁTICO (95 ms a 100 ms o menos)
         if (tiempoEstimadoNumber <= 100.00) { 
-            // Cierre automático (ocultar botón de reiniciar y cambiar el contenido)
+            // Cierre automático
             modalFinJuego.style.display = 'flex';
-            modalFinJuego.style.pointerEvents = 'none'; // Desactiva clics
+            modalFinJuego.style.pointerEvents = 'none'; 
             
-            // Reemplazar el contenido del modal con el mensaje de cierre
+            // Reemplazar el contenido del modal
             modalContenidoFin.innerHTML = `
                 <div style="color: #FFD700; border: 2px solid #FFD700; border-radius: 10px; padding: 20px; box-shadow: 0 0 20px #FFD700;">
                     <h2>¡TIEMPO DE REACCIÓN EXTREMO!</h2>
@@ -195,7 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
             finalFallosDisplay.textContent = fallos;
             tiempoReaccionEstimadoDisplay.textContent = `${tiempoEstimadoString} ms`;
             
-            // Asegurarse de que el botón de reiniciar esté visible para el flujo normal
             btnReiniciar.style.display = 'block'; 
             modalFinJuego.style.pointerEvents = 'auto'; 
             modalFinJuego.style.display = 'flex';
