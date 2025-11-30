@@ -1,12 +1,28 @@
+// -----------------------------------------------------------------
+// AJUSTES DE DIFICULTAD MÓVIL
+// -----------------------------------------------------------------
+const MOBILE_BREAKPOINT = 768; // Ancho máximo para aplicar dificultad móvil
+
+// Tiempo de inactividad (antes de que el círculo se mueva solo)
+const PC_INACTIVITY_MS = 1000; // 1.00 segundo (PC)
+const MOBILE_INACTIVITY_MS = 750; // 0.75 segundos (Móvil)
+
+// Tamaño del círculo
+const CIRCLE_SIZE_PC = '80px';
+const CIRCLE_SIZE_MOBILE = '55px';
+// -----------------------------------------------------------------
+
+
 let aciertos = 0;
 let fallos = 0;
 let movementTimerId; 
 let countdownTimerId; 
-let tiempoRestante = 60; // 1 minuto
+let tiempoRestante = 60; 
 let juegoActivo = false; 
-const INACTIVITY_TIME = 1000; // Tiempo que el círculo permanece antes de moverse por sí mismo
-const RETRASO_INICIO = 1000; // 1 segundo de gracia al inicio/reiniciar
-const ACIERTOS_UMBRAL = 40; // Umbral para la estimación de tiempo de reacción
+const RETRASO_INICIO = 1000;
+const ACIERTOS_UMBRAL = 40; 
+
+let currentInactivityTime; 
 
 const COLOR_ACENTO = '#00FFC0';
 const COLOR_VERDE_MOVIMIENTO = '#00CC00'; 
@@ -22,7 +38,6 @@ const SHADOW_VERDE = '0 0 15px ' + COLOR_VERDE_MOVIMIENTO;
 // -----------------------------------------------------
 
 function generarNumeroAleatorio(min, max) {
-    // Genera un número flotante aleatorio entre min y max, con 2 decimales.
     return (Math.random() * (max - min) + min).toFixed(2);
 }
 
@@ -30,11 +45,9 @@ function calcularTiempoReaccionEstimado(aciertos) {
     let min, max;
     
     if (aciertos > ACIERTOS_UMBRAL) {
-        // Rango Rápido Extremo: De 90 ms a 110 ms
-        min = 90;
+        min = 90; // Permite hasta 95 ms para el cierre automático
         max = 110;
     } else {
-        // Rango Estándar: De 150 ms a 300 ms
         min = 150;
         max = 300;
     }
@@ -43,10 +56,11 @@ function calcularTiempoReaccionEstimado(aciertos) {
 }
 
 // -----------------------------------------------------
+// FUNCIÓN PRINCIPAL DE INICIO
+// -----------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Elementos del DOM (Todos los IDs están siendo capturados aquí)
     const modalInicioJuego = document.querySelector('#modal-inicio-juego');
     const btnIniciar = document.querySelector('#btn-iniciar');
 
@@ -69,17 +83,33 @@ document.addEventListener('DOMContentLoaded', function() {
         conteoAciertosDisplay, conteoFallosDisplayExterno, temporizadorDisplay, 
         botonCirculo, mainContainer
     ];
-
+    
     // -----------------------------------------------------
-    // FUNCIONES DE CONTROL DE PANTALLA Y POSICIONAMIENTO
+    // LÓGICA DE DETECCIÓN Y AJUSTE DE DIFICULTAD
     // -----------------------------------------------------
-
+    function aplicarAjusteMovil() {
+        if (window.innerWidth <= MOBILE_BREAKPOINT) {
+            currentInactivityTime = MOBILE_INACTIVITY_MS;
+            
+            botonCirculo.style.width = CIRCLE_SIZE_MOBILE;
+            botonCirculo.style.height = CIRCLE_SIZE_MOBILE;
+            centrarCirculo(); 
+            
+        } else {
+            currentInactivityTime = PC_INACTIVITY_MS;
+            botonCirculo.style.width = CIRCLE_SIZE_PC;
+            botonCirculo.style.height = CIRCLE_SIZE_PC;
+        }
+    }
+    // -----------------------------------------------------
+    
+    
     function centrarCirculo() {
         botonCirculo.style.position = 'fixed'; 
 
         const anchoVentana = window.innerWidth;
         const altoVentana = window.innerHeight;
-        const anchoCirculo = botonCirculo.clientWidth;
+        const anchoCirculo = botonCirculo.clientWidth; 
         const altoCirculo = botonCirculo.clientHeight;
 
         const nuevoX = (anchoVentana / 2) - (anchoCirculo / 2);
@@ -92,9 +122,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function inicializarPantalla() {
         elementosDelJuego.forEach(el => el.classList.add('oculto'));
         
+        aplicarAjusteMovil();
         centrarCirculo();
         
-        window.addEventListener('resize', centrarCirculo);
+        window.addEventListener('resize', () => {
+             aplicarAjusteMovil();
+             centrarCirculo();
+        });
         
         actualizarContadores();
         actualizarTemporizadorDisplay(); 
@@ -107,10 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         iniciarTemporizadorCountdown(); 
     }
-
-    // -----------------------------------------------------
-    // FUNCIONES DE JUEGO PRINCIPALES
-    // -----------------------------------------------------
 
     function actualizarContadores() {
         conteoAciertosDisplay.textContent = `Aciertos: ${aciertos}`;
@@ -163,17 +193,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         botonCirculo.style.display = 'none';
 
-        // Calcular el tiempo de reacción estimado
         const tiempoEstimadoString = calcularTiempoReaccionEstimado(aciertos);
         const tiempoEstimadoNumber = parseFloat(tiempoEstimadoString); 
 
-        // LÓGICA DE CIERRE AUTOMÁTICO (95 ms a 100 ms o menos)
+        // LÓGICA DE CIERRE AUTOMÁTICO (<= 100.00 ms)
         if (tiempoEstimadoNumber <= 100.00) { 
-            // Cierre automático
             modalFinJuego.style.display = 'flex';
             modalFinJuego.style.pointerEvents = 'none'; 
             
-            // Reemplazar el contenido del modal
             modalContenidoFin.innerHTML = `
                 <div style="color: #FFD700; border: 2px solid #FFD700; border-radius: 10px; padding: 20px; box-shadow: 0 0 20px #FFD700;">
                     <h2>¡TIEMPO DE REACCIÓN EXTREMO!</h2>
@@ -211,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modalFinJuego.style.display = 'none';
         botonCirculo.style.display = 'block';
 
+        aplicarAjusteMovil(); 
         centrarCirculo();
 
         actualizarContadores();
@@ -227,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
             botonCirculo.style.backgroundColor = COLOR_ACENTO; 
             botonCirculo.style.boxShadow = SHADOW_ACENTO;
             resetMovementTimer(); 
-        }, INACTIVITY_TIME);
+        }, currentInactivityTime);
     }
 
     function manejarAcierto() {
@@ -301,7 +329,6 @@ document.addEventListener('DOMContentLoaded', function() {
     botonCirculo.addEventListener('click', manejarAcierto);
     cuerpoPagina.addEventListener('click', manejarFallo);
     btnReiniciar.addEventListener('click', reiniciarJuego); 
-    
     btnIniciar.addEventListener('click', iniciarJuego); 
 
     inicializarPantalla();
