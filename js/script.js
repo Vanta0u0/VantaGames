@@ -19,6 +19,7 @@ let currentInactivityTime;
 let tiempoMovimiento; // Momento exacto en que el círculo se mueve (Punto B)
 let sumaTiemposReaccion = 0; // Suma total de todos los tiempos de acierto
 // La penalización por fallos NO se aplica en el cálculo de promedio.
+const UMBRAL_CIERRE_EXTREMO = 90.00; // Umbral original para detección de fraude
 
 const COLOR_ACENTO = '#00FFC0';
 const COLOR_VERDE_MOVIMIENTO = '#00CC00'; 
@@ -69,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
         botonCirculo, mainContainer
     ];
     
-    // --- ELEMENTOS Y LÓGICA DE CONTROL MÓVIL RESTAURADA ---
+    // --- ELEMENTOS Y LÓGICA DE CONTROL MÓVIL ---
     const principalColumna = document.getElementById('principal-columna');
     const explicacionColumna = document.getElementById('explicacion-columna');
     const novedadesColumna = document.getElementById('novedades-columna');
@@ -78,12 +79,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCerrarColumnas = document.querySelectorAll('.btn-cerrar-columna');
 
     function abrirColumna(columna) {
-        if (window.innerWidth <= MOBILE_BREAKPOINT) {
-            principalColumna.style.display = 'none';
-        }
+        if (window.innerWidth <= MOBILE_BREAKPOINT) { principalColumna.style.display = 'none'; }
         explicacionColumna.style.display = 'none';
         novedadesColumna.style.display = 'none';
-
         columna.style.display = 'flex'; 
         columna.style.flexDirection = 'column';
     }
@@ -91,11 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function cerrarColumna() {
         explicacionColumna.style.display = 'none';
         novedadesColumna.style.display = 'none';
-        
-        if (window.innerWidth <= MOBILE_BREAKPOINT) {
-            principalColumna.style.display = 'flex';
-            principalColumna.style.flexDirection = 'column';
-        }
+        if (window.innerWidth <= MOBILE_BREAKPOINT) { principalColumna.style.display = 'flex'; principalColumna.style.flexDirection = 'column'; }
     }
     // -----------------------------------------------------
     
@@ -211,8 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const tiempoReaccionFinal = calcularTiempoReaccionPromedio(); 
         const tiempoEstimadoNumber = parseFloat(tiempoReaccionFinal); 
 
-        // LÓGICA DE CIERRE AUTOMÁTICO (Si el tiempo promedio es extremadamente bajo)
-        if (tiempoEstimadoNumber <= 90.00) { 
+        // LÓGICA DE CIERRE AUTOMÁTICO por tiempo de reacción anormalmente bajo
+        if (tiempoEstimadoNumber <= UMBRAL_CIERRE_EXTREMO) { 
             modalFinJuego.style.display = 'flex';
             modalFinJuego.style.pointerEvents = 'none'; 
             
@@ -223,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p style="font-size: 2em; font-weight: bold; margin: 15px 0;">
                         ${tiempoReaccionFinal} ms
                     </p>
-                    <p>El juego se ha detenido automáticamente.</p>
+                    <p>El juego se ha detenido automáticamente por detección de un tiempo de reacción anormal.</p>
                     <p style="font-size: 0.9em; margin-top: 20px;">
                         Para volver a jugar, debes recargar la página.
                     </p>
@@ -285,8 +279,8 @@ document.addEventListener('DOMContentLoaded', function() {
         botonCirculo.style.left = `${nuevoX}px`;
         botonCirculo.style.top = `${nuevoY}px`;
         
-        // REGISTRA EL TIEMPO INSTANTÁNEO EN QUE EL CÍRCULO LLEGÓ A SU NUEVA POSICIÓN (Punto B)
-        // Esto inicia el contador de reacción, eliminando el tiempo de la transición CSS (0.2s).
+        // PUNTO CLAVE: REINICIO DEL CONTEO DE REACCIÓN
+        // Esto inicia el contador de reacción en el milisegundo exacto en que el círculo cambia de posición.
         tiempoMovimiento = performance.now();
     }
 
@@ -294,8 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function manejarAcierto() {
         if (tiempoRestante === 0 || !juegoActivo) return;
 
-        // CALCULAR EL TIEMPO DE REACCIÓN
-        // Tiempo de clic (ahora) - Tiempo en que el círculo llegó a la posición (Punto B)
+        // CALCULAR EL TIEMPO DE REACCIÓN: (Tiempo de clic) - (Tiempo de llegada del círculo)
         const tiempoReaccion = performance.now() - tiempoMovimiento;
         sumaTiemposReaccion += tiempoReaccion; 
         
@@ -310,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cuerpoPagina.style.backgroundColor = COLOR_AZUL_CELEBRACION_FLASH;
         }
         
-        moverCirculoAleatoriamente();
+        moverCirculoAleatoriamente(); // Esto reinicia el contador de tiempoMovimiento
         resetMovementTimer(); 
         
         setTimeout(() => {
@@ -330,15 +323,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (event.target.id !== 'btn-circulo') {
             fallos++;
             
-            // Los fallos se registran, pero NO AFECTAN el cálculo de T_promedio.
-            
             conteoFallosDisplayInterno.textContent = `Fallos: ${fallos}`;
             conteoFallosDisplayExterno.textContent = `Fallos Totales: ${fallos}`; 
             
             cuerpoPagina.style.backgroundColor = COLOR_FONDO_FALLO;
             conteoFallosDisplayExterno.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
             
-            moverCirculoAleatoriamente();
+            moverCirculoAleatoriamente(); // Esto reinicia el contador de tiempoMovimiento
             resetMovementTimer(); 
             
             botonCirculo.style.backgroundColor = COLOR_ACENTO; 
@@ -359,18 +350,10 @@ document.addEventListener('DOMContentLoaded', function() {
     btnReiniciar.addEventListener('click', reiniciarJuego); 
     btnIniciar.addEventListener('click', iniciarJuego); 
     
-    // --- EVENT LISTENERS DE CONTROL MÓVIL RESTAURADOS ---
-    btnAbrirExplicacion.addEventListener('click', () => {
-        abrirColumna(explicacionColumna);
-    });
-
-    btnAbrirNovedades.addEventListener('click', () => {
-        abrirColumna(novedadesColumna);
-    });
-
-    btnCerrarColumnas.forEach(btn => {
-        btn.addEventListener('click', cerrarColumna);
-    });
+    // --- EVENT LISTENERS DE CONTROL MÓVIL ---
+    btnAbrirExplicacion.addEventListener('click', () => { abrirColumna(explicacionColumna); });
+    btnAbrirNovedades.addEventListener('click', () => { abrirColumna(novedadesColumna); });
+    btnCerrarColumnas.forEach(btn => { btn.addEventListener('click', cerrarColumna); });
 
 
     inicializarPantalla();
