@@ -111,7 +111,8 @@ h1 {
     margin: 0; 
     display: block; 
     
-    /* SE ELIMINA LA TRANSICIÓN PARA EL MOVIMIENTO INSTANTÁNEO */
+    /* ¡TRANSICIÓN RESTAURADA! Esto añade el movimiento suave */
+    transition: all 0.2s ease;
     
     pointer-events: auto; 
     z-index: 900; 
@@ -267,4 +268,8 @@ h1 {
 /* Clase para ocultar elementos del juego */
 .oculto {
     display: none !important;
+}ara ocultar elementos del juego */
+.oculto {
+    display: none !important;
 }
+
