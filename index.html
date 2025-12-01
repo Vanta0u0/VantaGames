@@ -3,73 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test de Reacción Rápida</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Juego de Reacción Extrema</title>
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
 
-    <main id="main-container">
-        <div id="contadores">
-            <span id="conteo-aciertos" class="contador">Aciertos: 0</span>
-            <span id="conteo-fallos-exterior" class="contador">Fallos Totales: 0</span>
-            <span id="temporizador" class="contador">1:00</span>
-        </div>
-
+    <div id="main-container">
+        <h1>Juego de Reacción Extrema</h1>
+        
         <button id="btn-circulo" class="oculto"></button>
+    </div>
 
-        <div id="conteo-fallos" class="mensaje-fallo">Fallos: 0</div>
-    </main>
+    <div id="temporizador" class="oculto">Tiempo: 60s</div>
+
+    <div id="conteo-aciertos" class="oculto">Aciertos: 0</div>
     
+    <div id="conteo-fallos-exterior" class="oculto">Fallos: 0</div>
+    
+    <div id="conteo-fallos" class="oculto">¡FALLO!</div>
+
+
     <div id="modal-inicio-juego" class="modal">
-        <div id="grid-inicio" class="modal-contenido">
-            
-            <div id="explicacion-columna" class="modal-columna columna-flotante">
-                <button class="btn-cerrar-columna">X</button>
-                <h3 class="columna-titulo">📚 Cómo Jugar</h3>
-                <ol>
-                    <li>El objetivo es hacer **clic o tocar** el círculo lo más rápido posible.</li>
-                    <li>Cada vez que tocas el círculo, este se mueve a una posición aleatoria.</li>
-                    <li>Si haces clic o tocas **fuera** del círculo, se registrará un fallo y el círculo se moverá.</li>
-                    <li>Si no tocas el círculo a tiempo (1.0s en PC, 0.75s en Móvil), se moverá automáticamente, pero no contará como fallo.</li>
-                    <li>El juego dura **60 segundos**.</li>
-                    <li>Tu puntuación final será el **tiempo de reacción promedio** de todos tus aciertos.</li>
-                </ol>
-            </div>
-
-            <div id="principal-columna" class="modal-columna">
-                <h2>Test de Reacción Rápida</h2>
-                <p>Mide tu velocidad de respuesta en milisegundos.</p>
-                <button id="btn-iniciar" class="btn-principal">INICIAR JUEGO</button>
-                
-                </div>
-
-            <div id="novedades-columna" class="modal-columna columna-flotante">
-                <button class="btn-cerrar-columna">X</button>
-                <h3 class="columna-titulo">✨ Novedades de la Versión Final</h3>
-                <ul>
-                    <li>**Dificultad Condicional:** El círculo es más pequeño (55px) y se mueve más rápido (750ms) en **móviles**.</li>
-                    <li>**Cálculo de Reacción Pura:** En móviles, el tiempo medido es tu toque, excluyendo el tiempo de movimiento táctil.</li>
-                    <li>**Detección Extrema:** Cierre automático del juego si el tiempo promedio es sospechosamente bajo (< 90ms).</li>
-                    <li>**Diseño Móvil Compacto:** El modal de inicio se ajusta para una mejor visibilidad en pantallas pequeñas.</li>
-                </ul>
-            </div>
-            
+        <div class="modal-contenido-inicio">
+            <h2>🚀 ¡Reacción Extrema!</h2>
+            <p>Presiona INICIAR para comenzar. El tiempo de aparición del círculo se ajusta automáticamente a tu dispositivo (Móvil vs. Escritorio).</p>
+            <button id="btn-iniciar">INICIAR JUEGO</button>
         </div>
     </div>
 
-    <div id="modal-fin-juego" class="modal">
-        <div class="modal-contenido">
-            <h2>🎉 Juego Terminado 🎉</h2>
-            <div class="resultados-finales">
-                <p>Aciertos totales: <span id="final-aciertos">0</span></p>
-                <p>Fallos totales: <span id="final-fallos">0</span></p>
-                <p>Tiempo de Reacción Promedio:</p>
-                <h3 id="tiempo-reaccion-estimado">0000.00 ms</h3>
+    <div id="modal-fin-juego" class="modal oculto">
+        <div class="modal-contenido" id="modal-fin-juego-contenido">
             </div>
-            <button id="btn-reiniciar" class="btn-principal">REINICIAR JUEGO</button>
-        </div>
     </div>
 
-    <script src="js/script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
