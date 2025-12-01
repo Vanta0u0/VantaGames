@@ -1,15 +1,11 @@
-const MOBILE_BREAKPOINT = 768; 
-
-// --- DIFICULTAD BASE (PC/Mouse) ---
+const MOBILE_BREAKPOINT = 768; // Ancho máximo para aplicar dificultad móvil
+// Tiempo de inactividad (antes de que el círculo se mueva solo)
 const PC_INACTIVITY_MS = 1000; // 1.00 segundo (PC)
-const CIRCLE_SIZE_PC = '80px';
-
-// --- DIFICULTAD ESTRICTA (Móvil/Táctil) ---
 const MOBILE_INACTIVITY_MS = 750; // 0.75 segundos (Móvil)
+// Tamaño del círculo
+const CIRCLE_SIZE_PC = '80px';
 const CIRCLE_SIZE_MOBILE = '55px';
-
 // -----------------------------------------------------------------
-
 let aciertos = 0;
 let fallos = 0;
 let movementTimerId; 
@@ -20,12 +16,10 @@ const RETRASO_INICIO = 1000;
 
 // Variables para el Cálculo del Tiempo de Reacción
 let currentInactivityTime; 
-let tiempoMovimiento; // Usado para el cálculo de reacción Pura (Móvil)
-let sumaTiemposReaccion = 0; 
-const UMBRAL_CIERRE_EXTREMO = 90.00;
-let tiempoInicioIntentoPC; // Usado para el cálculo de reacción Estándar (PC)
+let tiempoMovimiento; // Momento exacto en que el círculo se mueve (INSTANTÁNEO)
+let sumaTiemposReaccion = 0; // Suma total de todos los tiempos de acierto
+// La constante PENALIZACION_FALLO_MS se ha ELIMINADO de los cálculos.
 
-// Constantes de Estilo
 const COLOR_ACENTO = '#00FFC0';
 const COLOR_VERDE_MOVIMIENTO = '#00CC00'; 
 const COLOR_AZUL_CELEBRACION_FLASH = 'rgba(0, 191, 255, 0.5)';
@@ -37,40 +31,29 @@ const SHADOW_VERDE = '0 0 15px ' + COLOR_VERDE_MOVIMIENTO;
 // -----------------------------------------------------
 // FUNCIONES DE CÁLCULO DE PUNTUACIÓN
 // -----------------------------------------------------
-
 function calcularTiempoReaccionPromedio() {
+    // Calcula el tiempo de reacción promedio (en ms).
+    // Ya no se aplica penalización por fallos.
+    
     if (aciertos === 0) {
+        // Si no hay aciertos, devuelve un valor alto para evitar división por cero.
         return 9999.00.toFixed(2);
     }
+    
+    // El promedio es el tiempo total de aciertos dividido por el número de aciertos.
     const promedio = sumaTiemposReaccion / aciertos;
+    
     return promedio.toFixed(2);
 }
 
 // -----------------------------------------------------
-// LÓGICA DE DIFICULTAD CONDICIONAL
+// FUNCIÓN PRINCIPAL DE INICIO
 // -----------------------------------------------------
-
-function aplicarAjusteMovil(botonCirculo) {
-    const circulo = document.querySelector('#btn-circulo'); 
-    
-    if (window.innerWidth <= MOBILE_BREAKPOINT) {
-        currentInactivityTime = MOBILE_INACTIVITY_MS;
-        if(circulo) circulo.style.width = CIRCLE_SIZE_MOBILE;
-        if(circulo) circulo.style.height = CIRCLE_SIZE_MOBILE;
-    } else {
-        currentInactivityTime = PC_INACTIVITY_MS;
-        if(circulo) circulo.style.width = CIRCLE_SIZE_PC;
-        if(circulo) circulo.style.height = CIRCLE_SIZE_PC;
-    }
-    if (typeof centrarCirculo === 'function') centrarCirculo();
-}
-
-// -----------------------------------------------------
-
 document.addEventListener('DOMContentLoaded', function() {
     
     const modalInicioJuego = document.querySelector('#modal-inicio-juego');
     const btnIniciar = document.querySelector('#btn-iniciar');
+
     const conteoAciertosDisplay = document.querySelector('#conteo-aciertos');
     const conteoFallosDisplayExterno = document.querySelector('#conteo-fallos-exterior');
     const conteoFallosDisplayInterno = document.querySelector('#conteo-fallos');
@@ -78,36 +61,38 @@ document.addEventListener('DOMContentLoaded', function() {
     const botonCirculo = document.querySelector('#btn-circulo'); 
     const cuerpoPagina = document.querySelector('body');
     const mainContainer = document.querySelector('#main-container'); 
+
     const modalFinJuego = document.querySelector('#modal-fin-juego');
     const modalContenidoFin = document.querySelector('#modal-fin-juego .modal-contenido'); 
     const finalAciertosDisplay = document.querySelector('#final-aciertos');
     const finalFallosDisplay = document.querySelector('#final-fallos');
     const btnReiniciar = document.querySelector('#btn-reiniciar');
     const tiempoReaccionEstimadoDisplay = document.querySelector('#tiempo-reaccion-estimado');
-    const principalColumna = document.getElementById('principal-columna');
 
     const elementosDelJuego = [
         conteoAciertosDisplay, conteoFallosDisplayExterno, temporizadorDisplay, 
         botonCirculo, mainContainer
     ];
     
-    const explicacionColumna = document.getElementById('explicacion-columna');
-    const novedadesColumna = document.getElementById('novedades-columna');
-    const btnCerrarColumnas = document.querySelectorAll('.btn-cerrar-columna');
-
-    function abrirColumna(columna) {
-        if (window.innerWidth <= MOBILE_BREAKPOINT) { principalColumna.style.display = 'none'; }
-        explicacionColumna.style.display = 'none';
-        novedadesColumna.style.display = 'none';
-        columna.style.display = 'flex'; 
-        columna.style.flexDirection = 'column';
+    // -----------------------------------------------------
+    // LÓGICA DE DETECCIÓN Y AJUSTE DE DIFICULTAD
+    // -----------------------------------------------------
+    function aplicarAjusteMovil() {
+        if (window.innerWidth <= MOBILE_BREAKPOINT) {
+            currentInactivityTime = MOBILE_INACTIVITY_MS;
+            
+            botonCirculo.style.width = CIRCLE_SIZE_MOBILE;
+            botonCirculo.style.height = CIRCLE_SIZE_MOBILE;
+            centrarCirculo(); 
+            
+        } else {
+            currentInactivityTime = PC_INACTIVITY_MS;
+            botonCirculo.style.width = CIRCLE_SIZE_PC;
+            botonCirculo.style.height = CIRCLE_SIZE_PC;
+        }
     }
-
-    function cerrarColumna() {
-        explicacionColumna.style.display = 'none';
-        novedadesColumna.style.display = 'none';
-        if (window.innerWidth <= MOBILE_BREAKPOINT) { principalColumna.style.display = 'flex'; principalColumna.style.flexDirection = 'column'; }
-    }
+    // -----------------------------------------------------
+    
     
     function centrarCirculo() {
         botonCirculo.style.position = 'fixed'; 
@@ -124,30 +109,16 @@ document.addEventListener('DOMContentLoaded', function() {
         botonCirculo.style.top = `${nuevoY}px`;
     }
 
-    function moverCirculoAleatoriamente() {
-        const anchoMaximo = window.innerWidth - botonCirculo.clientWidth;
-        const altoMaximo = window.innerHeight - botonCirculo.clientHeight;
-
-        const nuevoX = Math.floor(Math.random() * anchoMaximo);
-        const nuevoY = Math.floor(Math.random() * altoMaximo);
-        
-        botonCirculo.style.position = 'fixed'; 
-        botonCirculo.style.left = `${nuevoX}px`;
-        botonCirculo.style.top = `${nuevoY}px`;
-        
-        if (window.innerWidth <= MOBILE_BREAKPOINT) {
-            tiempoMovimiento = performance.now(); 
-        } else {
-            tiempoInicioIntentoPC = performance.now(); 
-        }
-    }
-    
     function inicializarPantalla() {
         elementosDelJuego.forEach(el => el.classList.add('oculto'));
         
-        aplicarAjusteMovil(botonCirculo);
+        aplicarAjusteMovil();
+        centrarCirculo();
         
-        window.addEventListener('resize', () => aplicarAjusteMovil(botonCirculo));
+        window.addEventListener('resize', () => {
+             aplicarAjusteMovil();
+             centrarCirculo();
+        });
         
         actualizarContadores();
         actualizarTemporizadorDisplay(); 
@@ -155,7 +126,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function iniciarJuego() {
         elementosDelJuego.forEach(el => el.classList.remove('oculto'));
+
         modalInicioJuego.style.display = 'none';
+
         iniciarTemporizadorCountdown(); 
     }
 
@@ -171,8 +144,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const segundosFormateados = segundos < 10 ? `0${segundos}` : segundos;
         temporizadorDisplay.textContent = `${minutos}:${segundosFormateados}`;
 
-        temporizadorDisplay.style.color = tiempoRestante <= 10 && tiempoRestante > 0 ? 'red' : '#FFFFFF';
-        temporizadorDisplay.style.borderColor = tiempoRestante <= 10 && tiempoRestante > 0 ? 'red' : '#FFFFFF';
+        if (tiempoRestante <= 10 && tiempoRestante > 0) {
+            temporizadorDisplay.style.color = 'red';
+            temporizadorDisplay.style.borderColor = 'red';
+        } else {
+            temporizadorDisplay.style.color = '#FFFFFF';
+            temporizadorDisplay.style.borderColor = '#FFFFFF';
+        }
     }
 
     function iniciarTemporizadorCountdown() {
@@ -202,58 +180,61 @@ document.addEventListener('DOMContentLoaded', function() {
         temporizadorDisplay.style.borderColor = COLOR_ACENTO;
         
         clearTimeout(movementTimerId); 
+        
         botonCirculo.style.display = 'none';
 
         const tiempoReaccionFinal = calcularTiempoReaccionPromedio(); 
         const tiempoEstimadoNumber = parseFloat(tiempoReaccionFinal); 
 
-        if (tiempoEstimadoNumber <= UMBRAL_CIERRE_EXTREMO) { 
+        // LÓGICA DE CIERRE AUTOMÁTICO (Si el tiempo promedio es extremadamente bajo)
+        if (tiempoEstimadoNumber <= 90.00) { 
             modalFinJuego.style.display = 'flex';
             modalFinJuego.style.pointerEvents = 'none'; 
             
             modalContenidoFin.innerHTML = `
                 <div style="color: #FFD700; border: 2px solid #FFD700; border-radius: 10px; padding: 20px; box-shadow: 0 0 20px #FFD700;">
                     <h2>¡TIEMPO DE REACCIÓN EXTREMO!</h2>
-                    <p>Tu tiempo de reacción promedio fue de: <span style="font-size: 1.5em; font-weight: bold;">${tiempoReaccionFinal} ms</span></p>
-                    <p>El juego se ha detenido automáticamente por detección de un tiempo de reacción anormal.</p>
-                    <p style="font-size: 0.9em; margin-top: 20px;">Para volver a jugar, debes recargar la página.</p>
+                    <p>Tu tiempo de reacción promedio fue de:</p>
+                    <p style="font-size: 2em; font-weight: bold; margin: 15px 0;">
+                        ${tiempoReaccionFinal} ms
+                    </p>
+                    <p>El juego se ha detenido automáticamente.</p>
+                    <p style="font-size: 0.9em; margin-top: 20px;">
+                        Para volver a jugar, debes recargar la página.
+                    </p>
                 </div>
             `;
             
         } else {
+            // Flujo Normal de Fin de Juego
             finalAciertosDisplay.textContent = aciertos;
             finalFallosDisplay.textContent = fallos;
             tiempoReaccionEstimadoDisplay.textContent = `${tiempoReaccionFinal} ms`;
             
-            modalContenidoFin.innerHTML = `
-                <h2>🎉 Juego Terminado 🎉</h2>
-                <div class="resultados-finales">
-                    <p>Aciertos totales: <span id="final-aciertos">${aciertos}</span></p>
-                    <p>Fallos totales: <span id="final-fallos">${fallos}</span></p>
-                    <p>Tiempo de Reacción Promedio:</p>
-                    <h3 id="tiempo-reaccion-estimado">${tiempoReaccionFinal} ms</h3>
-                </div>
-                <button id="btn-reiniciar" class="btn-principal" style="display: block;">REINICIAR JUEGO</button>
-            `;
-
-            document.getElementById('btn-reiniciar').addEventListener('click', reiniciarJuego);
-
+            btnReiniciar.style.display = 'block'; 
             modalFinJuego.style.pointerEvents = 'auto'; 
             modalFinJuego.style.display = 'flex';
         }
     }
 
     function reiniciarJuego() {
-        aciertos = 0; fallos = 0; tiempoRestante = 60; sumaTiemposReaccion = 0; 
-        clearTimeout(movementTimerId); clearInterval(countdownTimerId); 
+        aciertos = 0;
+        fallos = 0;
+        tiempoRestante = 60;
+        sumaTiemposReaccion = 0; // Reinicia la suma de tiempos
+
+        clearTimeout(movementTimerId);
+        clearInterval(countdownTimerId); 
+
         modalFinJuego.style.display = 'none';
         botonCirculo.style.display = 'block';
-        
-        aplicarAjusteMovil(botonCirculo); 
+
+        aplicarAjusteMovil(); 
         centrarCirculo();
 
         actualizarContadores();
         actualizarTemporizadorDisplay();
+        
         iniciarTemporizadorCountdown(); 
     }
 
@@ -267,18 +248,28 @@ document.addEventListener('DOMContentLoaded', function() {
             resetMovementTimer(); 
         }, currentInactivityTime);
     }
-    
+
+    function moverCirculoAleatoriamente() {
+        const anchoMaximo = window.innerWidth - botonCirculo.clientWidth;
+        const altoMaximo = window.innerHeight - botonCirculo.clientHeight;
+
+        const nuevoX = Math.floor(Math.random() * anchoMaximo);
+        const nuevoY = Math.floor(Math.random() * altoMaximo);
+        
+        botonCirculo.style.position = 'fixed'; 
+        botonCirculo.style.left = `${nuevoX}px`;
+        botonCirculo.style.top = `${nuevoY}px`;
+        
+        // REGISTRA EL TIEMPO INSTANTÁNEO EN QUE EL CÍRCULO LLEGÓ A SU NUEVA POSICIÓN
+        tiempoMovimiento = performance.now();
+    }
+
+
     function manejarAcierto() {
         if (tiempoRestante === 0 || !juegoActivo) return;
 
-        let tiempoReaccion;
-        
-        if (window.innerWidth <= MOBILE_BREAKPOINT) {
-            tiempoReaccion = performance.now() - tiempoMovimiento;
-        } else {
-            tiempoReaccion = performance.now() - tiempoInicioIntentoPC;
-        }
-
+        // CALCULAR EL TIEMPO DE REACCIÓN
+        const tiempoReaccion = performance.now() - tiempoMovimiento;
         sumaTiemposReaccion += tiempoReaccion; 
         
         aciertos++;
@@ -292,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cuerpoPagina.style.backgroundColor = COLOR_AZUL_CELEBRACION_FLASH;
         }
         
-        moverCirculoAleatoriamente(); 
+        moverCirculoAleatoriamente();
         resetMovementTimer(); 
         
         setTimeout(() => {
@@ -312,13 +303,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (event.target.id !== 'btn-circulo') {
             fallos++;
             
+            // Los fallos se registran, pero NO AFECTAN el cálculo de T_promedio.
+            
             conteoFallosDisplayInterno.textContent = `Fallos: ${fallos}`;
             conteoFallosDisplayExterno.textContent = `Fallos Totales: ${fallos}`; 
             
             cuerpoPagina.style.backgroundColor = COLOR_FONDO_FALLO;
             conteoFallosDisplayExterno.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
             
-            moverCirculoAleatoriamente(); 
+            moverCirculoAleatoriamente();
             resetMovementTimer(); 
             
             botonCirculo.style.backgroundColor = COLOR_ACENTO; 
@@ -331,11 +324,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // -----------------------------------------------------
+    // EVENT LISTENERS Y LLAMADAS INICIALES
+    // -----------------------------------------------------
     botonCirculo.addEventListener('click', manejarAcierto);
     cuerpoPagina.addEventListener('click', manejarFallo);
     btnReiniciar.addEventListener('click', reiniciarJuego); 
     btnIniciar.addEventListener('click', iniciarJuego); 
-    btnCerrarColumnas.forEach(btn => { btn.addEventListener('click', cerrarColumna); });
 
     inicializarPantalla();
 });
