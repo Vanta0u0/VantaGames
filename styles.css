@@ -1,385 +1,123 @@
-:root {
-    --color-fondo: #121212; 
-    --color-texto-claro: #E0E0E0; 
-    --color-acento: #00FFC0; 
-    --color-fallo: #FF4136; 
-    /* Variable necesaria para el nuevo layout */
-    --color-fondo-columna: #1a1a1a; 
+/* -------------------------
+   ESTILOS GENERALES DEL JUEGO
+---------------------------- */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
 }
 
-/* ESTILOS GLOBALES */
-body {
-    background-color: var(--color-fondo); 
-    font-family: 'Arial', sans-serif;
-    color: var(--color-texto-claro); 
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    transition: background-color 0.15s ease-out; 
-    /* Se añaden flexbox para centrar el modal de inicio/fin */
-    display: flex;
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+}
+
+/* -------------------------
+   BOTÓN CÍRCULO
+---------------------------- */
+#btn-circulo {
+    position: fixed;
+    border-radius: 50%;
+    background-color: #00FFC0;
+    box-shadow: 0 0 15px #00FFC0;
+    cursor: pointer;
+    z-index: 500;
+}
+
+/* -------------------------
+   CONTADORES
+---------------------------- */
+.contador {
+    padding: 10px 15px;
+    margin: 5px;
+    font-weight: bold;
+    color: #fff;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 5px;
+    display: inline-block;
+}
+
+/* -------------------------
+   MODALES
+---------------------------- */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.7);
     justify-content: center;
     align-items: center;
-}
-
-/* CONTENEDOR PRINCIPAL: Ahora solo sirve como fondo para el juego */
-#main-container {
-    /* Eliminamos el padding y border/shadow del main-container para que el juego ocupe toda la pantalla de forma limpia */
-    width: 100%;
-    height: 100vh;
-    padding: 0;
-    border: none;
-    box-shadow: none;
-    background-color: transparent;
-    margin: 0;
-    position: relative;
-    z-index: 100;
-    pointer-events: none;
-}
-
-h1 {
-    color: var(--color-acento); 
-    text-align: center;
-    border-bottom: 2px solid var(--color-acento); 
-    padding-bottom: 15px;
-    margin-bottom: 30px;
-    text-shadow: 0 0 10px rgba(0, 255, 192, 0.5); 
-}
-
-/* ESTILOS DE BASE PARA CONTADORES INTERNOS (Oculto) */
-#conteo-fallos {
-    /* Para el efecto visual de "FALLO" */
-    color: var(--color-fallo); 
-    display: none; 
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 4em;
-    font-weight: bold;
-    opacity: 0.1;
-    pointer-events: none;
-    z-index: 10;
-}
-
-/* --- CONTADORES FIJOS INDIVIDUALES (MANTENIDOS) --- */
-#conteo-fallos-exterior {
-    position: fixed; 
-    top: 20px;
-    right: 20px;
-    padding: 10px;
-    font-size: 1.2em;
-    color: var(--color-fallo); 
-    background-color: var(--color-fondo-columna); 
-    border: 1px solid var(--color-fallo);
-    border-radius: 5px;
-    z-index: 1000; 
-    text-shadow: none;
-    transition: background-color 0.15s ease-out;
-    pointer-events: none; 
-}
-
-#conteo-aciertos {
-    position: fixed; 
-    top: 80px;
-    right: 20px;
-    padding: 10px;
-    font-size: 1.2em;
-    color: var(--color-acento); 
-    background-color: var(--color-fondo-columna); 
-    border: 1px solid var(--color-acento);
-    border-radius: 5px;
-    z-index: 1000; 
-    text-shadow: none;
-    transition: background-color 0.15s ease-out;
-    pointer-events: none; 
-}
-
-#temporizador {
-    position: fixed; 
-    top: 20px;
-    left: 20px; 
-    padding: 10px;
-    font-size: 1.2em;
-    color: var(--color-texto-claro); 
-    background-color: var(--color-fondo-columna); 
-    border: 1px solid var(--color-texto-claro); 
-    border-radius: 5px;
-    z-index: 1000; 
-    text-shadow: none;
-    transition: background-color 0.15s ease-out;
-    pointer-events: none; 
-}
-
-/* CÍRCULO INTERACTIVO */
-#btn-circulo {
-    width: 80px;  
-    height: 80px; 
-    border-radius: 50%; 
-    background-color: var(--color-acento); 
-    border: none;
-    cursor: pointer;
-    position: fixed !important; 
-    margin: 0; 
-    display: block; 
-    
-    transition: all 0.2s ease;
-    
-    pointer-events: auto; 
-    z-index: 900; 
-    box-shadow: 0 0 15px var(--color-acento); 
-    touch-action: manipulation; /* Mejoras para móvil */
-}
-
-#btn-circulo:hover {
-    background-color: #00E6B2; 
-    box-shadow: 0 0 25px var(--color-acento); 
-}
-
-/* --- ESTILOS DEL MODAL DE INICIO (Con layout de 3 columnas) --- */
-#modal-inicio-juego {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.95); 
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    z-index: 3000; 
-}
-
-/* NUEVOS ESTILOS PARA LA ESTRUCTURA DE 3 COLUMNAS */
-#grid-inicio { 
-    display: flex; 
-    gap: 20px; 
-    padding: 40px; 
-    border-radius: 10px; 
-    pointer-events: auto; 
-    max-width: 1100px; /* Asegura el ancho de escritorio */
-    width: 90%;
-}
-
-.modal-columna { 
-    background-color: var(--color-fondo-columna); 
-    border: 2px solid var(--color-acento); 
-    border-radius: 10px; 
-    padding: 25px; 
-    text-align: center; 
-    box-shadow: 0 0 30px rgba(0, 255, 192, 0.2); 
-    flex: 1; 
-    min-width: 250px; 
-    position: relative; 
-}
-
-/* Estilos de la columna central */
-#principal-columna { 
-    border-width: 3px; 
-    box-shadow: 0 0 50px var(--color-acento); 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
-    background-color: var(--color-fondo); 
-    min-width: 350px;
-}
-
-.columna-titulo { 
-    color: var(--color-acento); 
-    font-size: 1.4em; 
-    font-weight: bold; 
-    border-bottom: 1px solid rgba(0, 255, 192, 0.3); 
-    padding-bottom: 10px; 
-    margin-top: 0; 
-    margin-bottom: 15px; 
-    font-style: italic; 
-}
-
-#principal-columna h2 { color: var(--color-acento); font-size: 2.8em; margin-bottom: 10px; }
-#principal-columna p { font-size: 1.2em; margin-bottom: 25px; }
-
-#explicacion-columna ol, #novedades-columna ul { text-align: left; padding-left: 20px; font-size: 1em; }
-#explicacion-columna li, #novedades-columna li { margin-bottom: 8px; }
-
-/* Ocultar elementos de control móvil en escritorio */
-.btn-cerrar-columna,
-#control-movil-container {
-    display: none;
-}
-
-#btn-iniciar {
-    padding: 15px 30px;
-    font-size: 1.3em;
-    background-color: var(--color-acento);
-    color: var(--color-fondo); 
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    font-weight: bold;
-}
-
-#btn-iniciar:hover {
-    background-color: #00E6B2;
-    transform: scale(1.05);
-}
-
-/* --- ESTILOS RESPONSIVOS (MÓVIL) --- */
-@media (max-width: 768px) {
-    #grid-inicio {
-        flex-direction: column; /* Apila las columnas */
-        padding: 10px;
-        gap: 15px;
-    }
-
-    .modal-columna {
-        min-width: unset;
-    }
-    
-    /* Mostrar contenedor de botones para móvil */
-    #control-movil-container {
-        display: flex !important; 
-        justify-content: space-around;
-        gap: 10px;
-        margin-top: 20px;
-        width: 100%;
-    }
-    
-    .btn-control-movil {
-        padding: 10px;
-        flex-grow: 1;
-        font-size: 0.85em; 
-        background-color: transparent;
-        border: 1px solid var(--color-acento);
-        color: var(--color-acento);
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    /* Columnas laterales flotantes en móvil */
-    #explicacion-columna,
-    #novedades-columna {
-        display: none; /* Ocultar por defecto */
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        padding: 50px 15px 15px 15px;
-        overflow-y: auto;
-        background-color: var(--color-fondo);
-        z-index: 3003;
-        text-align: left;
-    }
-    
-    /* Botón de cerrar para columnas flotantes */
-    .btn-cerrar-columna {
-        display: block !important;
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        padding: 5px 10px;
-        background-color: var(--color-fallo);
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        z-index: 3004;
-    }
-
-    /* Compactar texto principal */
-    #principal-columna h2 { font-size: 2.2em; margin-bottom: 5px; } 
-    #principal-columna p { font-size: 1em; margin-bottom: 15px; } 
-}
-
-/* --- ESTILOS DEL MODAL DE FIN DE JUEGO (Mantenidos) --- */
-#modal-fin-juego {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); 
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    z-index: 2000; 
+    z-index: 1000;
 }
 
 .modal-contenido {
-    background-color: var(--color-fondo-columna);
-    border: 2px solid var(--color-acento);
-    border-radius: 10px;
-    padding: 30px 50px;
-    text-align: center;
-    box-shadow: 0 0 40px var(--color-acento);
-    color: var(--color-texto-claro);
-    pointer-events: auto; 
+    background-color: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    max-width: 400px;
+    text-align: center;
 }
 
-.modal-contenido h2 {
-    color: var(--color-acento);
-    font-size: 2em;
-    margin-bottom: 20px;
+/* -------------------------
+   COLUMNAS MÓVILES
+---------------------------- */
+.columna-movil {
+    display: none;
+    position: fixed;
+    top: 0; right: 0;
+    width: 80%;
+    height: 100%;
+    background-color: #1a1a1a;
+    color: #fff;
+    flex-direction: column;
+    padding: 20px;
+    z-index: 900;
+    overflow-y: auto;
 }
 
-.modal-contenido p {
-    font-size: 1.3em;
-    margin: 15px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.btn-cerrar-columna {
+    align-self: flex-end;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
-/* Estilos para las puntuaciones finales (mini-contadores) */
-.final-score-badge {
-    padding: 8px 15px; 
-    font-size: 1.2em; 
-    border-radius: 5px;
-    margin-left: 10px;
-    display: inline-block; 
-    font-weight: bold;
-    background-color: #303030; 
+/* -------------------------
+   BOTONES PRINCIPALES
+---------------------------- */
+.btn-principal {
+    padding: 10px 20px;
+    background-color: #00FFC0;
+    color: #000;
+    font-weight: bold;
+    border-radius: 8px;
+    margin-top: 10px;
 }
 
-.badge-fallo {
-    color: var(--color-fallo); 
-    border: 1px solid var(--color-fallo); 
-    box-shadow: 0 0 5px rgba(255, 65, 54, 0.5);
+/* -------------------------
+   EFECTOS DE COLOR (JS)
+---------------------------- */
+body.flash {
+    background-color: rgba(0,191,255,0.5);
 }
 
-.badge-acierto {
-    color: var(--color-acento); 
-    border: 1px solid var(--color-acento); 
-    box-shadow: 0 0 5px rgba(0, 255, 192, 0.5);
+body.fallo {
+    background-color: rgba(255,0,0,0.5);
 }
 
-.badge-reaccion {
-    color: var(--color-texto-claro); 
-    background-color: #303030;
-    border: 1px solid var(--color-texto-claro); 
-    box-shadow: 0 0 5px rgba(224, 224, 224, 0.5);
-}
-
-#btn-reiniciar {
-    padding: 10px 20px;
-    margin-top: 30px;
-    font-size: 1.1em;
-    background-color: var(--color-acento);
-    color: var(--color-fondo); 
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-}
-
-#btn-reiniciar:hover {
-    background-color: #00E6B2;
-    transform: scale(1.05);
-}
-
-/* Clase para ocultar elementos del juego */
-.oculto {
-    display: none !important;
+/* -------------------------
+   LAYOUT RESPONSIVO
+---------------------------- */
+@media screen and (max-width: 768px) {
+    .columna-movil {
+        width: 100%;
+    }
 }
