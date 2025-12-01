@@ -16,9 +16,9 @@ const RETRASO_INICIO = 1000;
 
 // Variables para el Cálculo del Tiempo de Reacción
 let currentInactivityTime; 
-let tiempoMovimiento; // Momento exacto en que el círculo se mueve (INSTANTÁNEO)
+let tiempoMovimiento; // Momento exacto en que el círculo se mueve (Punto B)
 let sumaTiemposReaccion = 0; // Suma total de todos los tiempos de acierto
-// La constante PENALIZACION_FALLO_MS se ha ELIMINADO de los cálculos.
+// La penalización por fallos NO se aplica en el cálculo de promedio.
 
 const COLOR_ACENTO = '#00FFC0';
 const COLOR_VERDE_MOVIMIENTO = '#00CC00'; 
@@ -32,7 +32,7 @@ const SHADOW_VERDE = '0 0 15px ' + COLOR_VERDE_MOVIMIENTO;
 // FUNCIONES DE CÁLCULO DE PUNTUACIÓN
 // -----------------------------------------------------
 function calcularTiempoReaccionPromedio() {
-    
+    // Cálculo: (Suma total de Tiempos de Reacción) / (Total de Aciertos)
     if (aciertos === 0) {
         return 9999.00.toFixed(2);
     }
@@ -43,13 +43,13 @@ function calcularTiempoReaccionPromedio() {
 }
 
 // -----------------------------------------------------
-// FUNCIÓN PRINCIPAL DE INICIO
+// FUNCIÓN PRINCIPAL DE INICIO Y LISTENERS
 // -----------------------------------------------------
 document.addEventListener('DOMContentLoaded', function() {
     
+    // --- ELEMENTOS GENERALES ---
     const modalInicioJuego = document.querySelector('#modal-inicio-juego');
     const btnIniciar = document.querySelector('#btn-iniciar');
-
     const conteoAciertosDisplay = document.querySelector('#conteo-aciertos');
     const conteoFallosDisplayExterno = document.querySelector('#conteo-fallos-exterior');
     const conteoFallosDisplayInterno = document.querySelector('#conteo-fallos');
@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const botonCirculo = document.querySelector('#btn-circulo'); 
     const cuerpoPagina = document.querySelector('body');
     const mainContainer = document.querySelector('#main-container'); 
-
     const modalFinJuego = document.querySelector('#modal-fin-juego');
     const modalContenidoFin = document.querySelector('#modal-fin-juego .modal-contenido'); 
     const finalAciertosDisplay = document.querySelector('#final-aciertos');
@@ -70,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         botonCirculo, mainContainer
     ];
     
-    // --- CONSTANTES Y LÓGICA DE CONTROL MÓVIL RESTAURADA ---
+    // --- ELEMENTOS Y LÓGICA DE CONTROL MÓVIL RESTAURADA ---
     const principalColumna = document.getElementById('principal-columna');
     const explicacionColumna = document.getElementById('explicacion-columna');
     const novedadesColumna = document.getElementById('novedades-columna');
@@ -98,7 +97,8 @@ document.addEventListener('DOMContentLoaded', function() {
             principalColumna.style.flexDirection = 'column';
         }
     }
-
+    // -----------------------------------------------------
+    
     // -----------------------------------------------------
     // LÓGICA DE DETECCIÓN Y AJUSTE DE DIFICULTAD
     // -----------------------------------------------------
@@ -285,7 +285,8 @@ document.addEventListener('DOMContentLoaded', function() {
         botonCirculo.style.left = `${nuevoX}px`;
         botonCirculo.style.top = `${nuevoY}px`;
         
-        // REGISTRA EL TIEMPO INSTANTÁNEO EN QUE EL CÍRCULO LLEGÓ A SU NUEVA POSICIÓN
+        // REGISTRA EL TIEMPO INSTANTÁNEO EN QUE EL CÍRCULO LLEGÓ A SU NUEVA POSICIÓN (Punto B)
+        // Esto inicia el contador de reacción, eliminando el tiempo de la transición CSS (0.2s).
         tiempoMovimiento = performance.now();
     }
 
@@ -294,6 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tiempoRestante === 0 || !juegoActivo) return;
 
         // CALCULAR EL TIEMPO DE REACCIÓN
+        // Tiempo de clic (ahora) - Tiempo en que el círculo llegó a la posición (Punto B)
         const tiempoReaccion = performance.now() - tiempoMovimiento;
         sumaTiemposReaccion += tiempoReaccion; 
         
