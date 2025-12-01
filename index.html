@@ -1,138 +1,62 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego de Reacción</title>
-    <link rel="stylesheet" href="estilos.css">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: #fff;
-            font-family: Arial, sans-serif;
-        }
-        .oculto {
-            display: none;
-        }
-        #btn-circulo {
-            position: fixed;
-            border-radius: 50%;
-            cursor: pointer;
-            background-color: #00FFC0;
-            z-index: 10;
-        }
-        #modal-inicio-juego, #modal-fin-juego {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            color: #fff;
-        }
-        .modal-contenido {
-            background: #202020;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        #temporizador, #conteo-aciertos, #conteo-fallos-exterior, #conteo-fallos {
-            position: fixed;
-            top: 10px;
-            font-size: 1.2em;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        #conteo-aciertos { left: 10px; }
-        #conteo-fallos-exterior { right: 10px; }
-        #temporizador { left: 50%; transform: translateX(-50%); }
-        #conteo-fallos { display: none; }
-        #principal-columna {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 100px;
-        }
-        .btn-principal {
-            padding: 10px 20px;
-            font-size: 1em;
-            cursor: pointer;
-            margin-top: 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #00FFC0;
-            color: #000;
-        }
-        #explicacion-columna, #novedades-columna {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 80%;
-            height: 100%;
-            background: #1a1a1a;
-            flex-direction: column;
-            z-index: 200;
-            padding: 20px;
-        }
-        .btn-cerrar-columna {
-            align-self: flex-end;
-            margin-bottom: 20px;
-            cursor: pointer;
-            background: #ff4444;
-            border: none;
-            padding: 5px 10px;
-            color: #fff;
-            border-radius: 5px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juego de Reacción</title>
+<link rel="stylesheet" href="estilos.css"> <!-- Tu CSS original -->
 </head>
 <body>
-    <!-- MODAL INICIO -->
-    <div id="modal-inicio-juego">
-        <div class="modal-contenido" id="grid-inicio">
-            <h1>Juego de Reacción</h1>
-            <button id="btn-iniciar" class="btn-principal">Iniciar Juego</button>
+
+<!-- Modal de Inicio -->
+<div id="modal-inicio-juego" class="modal">
+    <div class="modal-contenido">
+        <h1>¡Bienvenido al Juego!</h1>
+        <button id="btn-iniciar" class="btn-principal">INICIAR</button>
+    </div>
+</div>
+
+<!-- Contenedor principal para columnas móviles y juego -->
+<div id="principal-columna">
+    <!-- Contador de aciertos -->
+    <div id="conteo-aciertos" class="contador">Aciertos: 0</div>
+    <!-- Contador de fallos externo -->
+    <div id="conteo-fallos-exterior" class="contador">Fallos Totales: 0</div>
+    <!-- Temporizador -->
+    <div id="temporizador" class="contador">1:00</div>
+    <!-- Botón del juego (círculo) -->
+    <button id="btn-circulo" class="circulo"></button>
+</div>
+
+<!-- Columnas móviles -->
+<div id="explicacion-columna" class="columna-movil">
+    <button class="btn-cerrar-columna">Cerrar</button>
+    <h2>Cómo Jugar</h2>
+    <p>Haz clic en el círculo lo más rápido posible. Evita hacer clic fuera del círculo.</p>
+</div>
+
+<div id="novedades-columna" class="columna-movil">
+    <button class="btn-cerrar-columna">Cerrar</button>
+    <h2>Novedades</h2>
+    <p>Se han añadido mejoras en la puntuación y feedback visual.</p>
+</div>
+
+<!-- Modal de Fin de Juego -->
+<div id="modal-fin-juego" class="modal">
+    <div class="modal-contenido">
+        <h2>Resultados</h2>
+        <div class="resultados-finales">
+            <p>Aciertos totales: <span id="final-aciertos">0</span></p>
+            <p>Fallos totales: <span id="final-fallos">0</span></p>
+            <p>Tiempo de Reacción Promedio: <span id="tiempo-reaccion-estimado">0 ms</span></p>
         </div>
+        <button id="btn-reiniciar" class="btn-principal">REINICIAR JUEGO</button>
     </div>
+</div>
 
-    <!-- MODAL FIN -->
-    <div id="modal-fin-juego" class="oculto">
-        <div class="modal-contenido"></div>
-    </div>
+<!-- Contenedor dinámico para botones móviles (se inyecta por JS) -->
+<!-- <div id="control-movil-container"></div> -->
 
-    <!-- CONTADORES -->
-    <div id="conteo-aciertos" class="oculto">Aciertos: 0</div>
-    <div id="conteo-fallos-exterior" class="oculto">Fallos Totales: 0</div>
-    <div id="temporizador" class="oculto">1:00</div>
-    <div id="conteo-fallos">0</div>
-
-    <!-- CIRCULO -->
-    <div id="btn-circulo" class="oculto"></div>
-
-    <!-- CONTENEDOR PRINCIPAL -->
-    <div id="main-container"></div>
-
-    <!-- COLUMNA PRINCIPAL -->
-    <div id="principal-columna"></div>
-
-    <!-- COLUMNAS MOVILES -->
-    <div id="explicacion-columna">
-        <button class="btn-cerrar-columna">Cerrar</button>
-        <h2>Cómo Jugar</h2>
-        <p>Haz clic en el círculo lo más rápido que puedas. Evita hacer clic fuera.</p>
-    </div>
-
-    <div id="novedades-columna">
-        <button class="btn-cerrar-columna">Cerrar</button>
-        <h2>Novedades</h2>
-        <p>Últimas actualizaciones del juego.</p>
-    </div>
-
-    <script src="script.js" defer></script>
+<script src="juego.js"></script> <!-- Tu segundo JS -->
 </body>
 </html>
