@@ -1,14 +1,14 @@
 :root {
-    /* Variables de Color (Usadas por JS y CSS) */
     --color-fondo: #121212;
     --color-texto-claro: #E0E0E0;
     --color-acento: #00FFC0;
     --color-fallo: #FF4136;
-    --color-verde-movimiento: #00CC00; /* Usado por JS al acertar */
-    --color-fondo-columna: #1a1a1a; 
-    --mobile-breakpoint: 768px;
+    --color-fondo-columna: #1a1a1a;
+    --color-verde-movimiento: #00CC00; /* Añadida para consistencia con JS */
+    --mobile-breakpoint: 768px; /* Añadida para referencia */
 }
 
+/* --- ESTILOS GLOBALES Y BASE --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -21,78 +21,83 @@ body {
     color: var(--color-texto-claro);
     min-height: 100vh;
     transition: background-color 0.15s ease-out;
-    display: flex; /* Permite que el contenido se centre si no está fijo */
+    display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
-/* --- CONTENEDOR PRINCIPAL DEL JUEGO (Necesario para el clic de fallo) --- */
-/* Lo establecemos como el área principal del juego, no debe tener pointer-events: none; */
+/* --- CONTENEDOR PRINCIPAL DEL JUEGO (Área de Fallo) --- */
 #main-container {
     width: 100%;
     height: 100vh;
+    padding: 0;
     position: relative;
     z-index: 10;
-    cursor: crosshair; /* Indicador de juego */
-}
-
-
-/* --- CONTADORES SUPERIORES (TEMPORIZADOR Y CLICKS) --- */
-#contadores {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex; /* Agrupa los contadores en fila */
-    gap: 30px;
-    background-color: rgba(26, 26, 26, 0.7);
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 1000;
-    /* QUITAMOS pointer-events: none; para que el JS pueda cambiar el estilo */
-}
-
-.contador {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: var(--color-texto-claro);
-    padding: 5px 10px;
-    border: 2px solid var(--color-texto-claro); /* Borde de la "caja" */
-    border-radius: 5px;
-    transition: background-color 0.15s ease-out, color 0.15s ease-out;
+    /* CORRECCIÓN CRÍTICA: Eliminado pointer-events: none; para que se registre el clic de fallo */
+    pointer-events: auto; 
+    cursor: crosshair;
 }
 
 /* Estilo de base para el contador interno que no debe mostrarse */
 #conteo-fallos {
     display: none;
 }
+/* Estilos redundantes eliminados, ya que el HTML usa solo #contadores y .oculto:
+   #conteo-fallos-exterior, #conteo-aciertos, #temporizador no deben tener display: none; aquí
+*/
 
-/* CÍRCULO INTERACTIVO */
+/* --- CONTADORES EXTERIORES AGRUPADOS --- */
+#contadores {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    background-color: rgba(26, 26, 26, 0.7);
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    /* CORRECCIÓN: Eliminado pointer-events: none; para evitar que bloquee el círculo */
+}
+.contador {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--color-texto-claro);
+    padding: 5px 10px;
+    border: 2px solid var(--color-texto-claro);
+    border-radius: 5px;
+    text-shadow: none;
+    transition: background-color 0.15s ease-out;
+}
+
+
+/* --- CÍRCULO INTERACTIVO --- */
 #btn-circulo {
-    width: 80px; 
-    height: 80px; 
+    /* El tamaño base está bien, el JS lo ajusta */
     border-radius: 50%;
     background-color: var(--color-acento);
     border: none;
     cursor: pointer;
     position: fixed !important;
-    transition: all 0.2s ease; /* Transición para movimiento y color */
-    pointer-events: auto; /* IMPORTANTE: Debe poder ser clicado */
+    margin: 0;
+    display: block;
+    transition: all 0.2s ease;
+    pointer-events: auto;
     z-index: 900;
     box-shadow: 0 0 15px var(--color-acento);
     touch-action: manipulation;
+    /* Las dimensiones por defecto (80px) se manejan por JS, eliminamos las líneas redundantes */
 }
+
 #btn-circulo:hover {
     background-color: #00E6B2;
     box-shadow: 0 0 25px var(--color-acento);
 }
 
-
-/* ----------------------------------------------------------------- */
-/* --- MODAL DE INICIO (ESTRUCTURA DE 3 COLUMNAS) --- */
-/* ----------------------------------------------------------------- */
+/* --- ESTILOS DEL MODAL DE INICIO (ESTRUCTURA DE 3 COLUMNAS) --- */
 #modal-inicio-juego {
     position: fixed;
     top: 0;
@@ -135,90 +140,98 @@ body {
     background-color: var(--color-fondo);
     min-width: 350px;
 }
-.columna-titulo { 
-    color: var(--color-acento); font-size: 1.4em; font-weight: bold; 
-    border-bottom: 1px solid rgba(0, 255, 192, 0.3); padding-bottom: 10px;
-    margin-top: 0; margin-bottom: 15px; font-style: italic; 
+.columna-titulo {
+    color: var(--color-acento);
+    font-size: 1.4em;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 255, 192, 0.3);
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-style: italic;
 }
 #principal-columna h2 { color: var(--color-acento); font-size: 2.8em; margin-bottom: 10px; }
 #principal-columna p { font-size: 1.2em; margin-bottom: 25px; }
+#explicacion-columna ol, #novedades-columna ul { text-align: left; padding-left: 20px; font-size: 1em; }
+#explicacion-columna li, #novedades-columna li { margin-bottom: 8px; }
 
-/* Ocultar botones de móvil en escritorio (Regla de seguridad) */
-.btn-abrir-columna, .btn-cerrar-columna, #control-movil-container {
+/* Botones */
+.btn-principal {
+    padding: 15px 30px;
+    font-size: 1.3em;
+    background-color: var(--color-acento);
+    color: var(--color-fondo);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    font-weight: bold;
+    margin-top: 20px;
+}
+#btn-iniciar:hover, #btn-reiniciar:hover {
+    background-color: #00E6B2;
+    transform: scale(1.05);
+}
+
+/* Ocultar elementos de control móvil en PC (Regla de seguridad) */
+.btn-abrir-columna, .btn-cerrar-columna {
     display: none !important;
 }
-
-#btn-iniciar {
-    padding: 15px 30px; font-size: 1.3em;
-    background-color: var(--color-acento); color: var(--color-fondo);
-    border: none; border-radius: 8px; cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s; font-weight: bold;
+#control-movil-container {
+    display: none;
 }
-#btn-iniciar:hover { background-color: #00E6B2; transform: scale(1.05); }
 
-
-/* ----------------------------------------------------------------- */
 /* --- ESTILOS RESPONSIVOS: MÓVIL (Max 768px) --- */
-/* ----------------------------------------------------------------- */
-@media (max-width: 768px) {
-    
-    /* 1. COMPACTAR EL GRID PRINCIPAL */
+@media (max-width: var(--mobile-breakpoint)) {
+    /* 1. COMPACTAR GRID DE INICIO */
     #grid-inicio {
         flex-direction: column;
         width: 95%;
-        max-width: 95%;
         padding: 10px;
         gap: 0;
     }
-
     .modal-columna {
         width: 100%; padding: 15px; min-width: unset; box-shadow: none;
     }
     
-    /* 2. COLUMNAS LATERALES FLOTANTES (Manejadas por JS para el display) */
+    /* 2. COLUMNAS LATERALES FLOTANTES */
     #explicacion-columna, #novedades-columna {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         padding: 50px 15px 15px 15px;
-        overflow-y: auto; background-color: var(--color-fondo); 
-        z-index: 3003; text-align: left;
+        overflow-y: auto; background-color: var(--color-fondo); z-index: 3003; text-align: left;
+        /* Inicialmente deben estar ocultas, el JS las mostrará */
+        display: none; 
     }
 
-    /* 3. Reducir texto principal */
-    #principal-columna h2 { font-size: 2.0em; margin-bottom: 5px; }
-    #principal-columna p { font-size: 0.9em; margin-bottom: 15px; }
-    #btn-iniciar { font-size: 1.3em; padding: 12px 25px; width: 90%; }
-
-    /* 4. MOSTRAR BOTONES DE CONTROL INYECTADOS POR JS (Solo el contenedor) */
+    /* 3. Botones de Control Móvil */
     #control-movil-container {
-        display: flex !important; /* Muestra el contenedor inyectado por JS */
-        justify-content: space-around; gap: 10px;
-        margin-top: 20px; width: 90%; margin-left: auto; margin-right: auto;
+        display: flex !important; /* Hacemos visible el contenedor que JS inyecta */
+        justify-content: space-around; gap: 10px; margin-top: 20px; width: 90%; margin-left: auto; margin-right: auto;
     }
-    
-    /* Mostrar botón de Cerrar en las columnas laterales */
+    .btn-control-movil {
+        padding: 10px; flex-grow: 1; font-size: 0.85em; background-color: transparent;
+        border: 1px solid var(--color-acento); color: var(--color-acento); border-radius: 5px; cursor: pointer;
+        transition: background-color 0.2s;
+    }
     .btn-cerrar-columna {
-        display: block !important;
-        position: fixed; top: 10px; right: 10px;
-        padding: 5px 10px; font-size: 1.2em;
-        background-color: var(--color-fallo); color: white; border: none;
-        border-radius: 5px; cursor: pointer; z-index: 3004;
+        display: block !important; position: fixed; top: 10px; right: 10px;
+        padding: 5px 10px; font-size: 1.2em; background-color: var(--color-fallo);
+        color: white; border: none; border-radius: 5px; cursor: pointer; z-index: 3004;
     }
     
-    /* Ajuste de contadores en móvil */
+    /* 4. Ajuste de contadores en móvil */
     #contadores {
-        gap: 15px; padding: 8px 15px;
+        gap: 15px; padding: 8px 15px; width: 95%;
     }
     .contador {
-        font-size: 1.0em;
+        font-size: 1.0em; flex-grow: 1;
     }
 }
-
 
 /* --- ESTILOS DEL MODAL DE FIN DE JUEGO --- */
 #modal-fin-juego {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); display: flex;
-    justify-content: center; align-items: center; z-index: 2000;
+    background-color: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 2000;
 }
 .modal-contenido {
     background-color: var(--color-fondo-columna); border: 2px solid var(--color-acento);
@@ -228,10 +241,12 @@ body {
 .modal-contenido h2 { color: var(--color-acento); font-size: 2em; margin-bottom: 20px; }
 .modal-contenido p { font-size: 1.3em; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; }
 
-/* Estilos de los resultados finales */
+/* Estilos de las puntuaciones finales */
 .final-score-badge { padding: 8px 15px; font-size: 1.2em; border-radius: 5px; margin-left: 10px; display: inline-block; font-weight: bold; background-color: #303030; }
 .badge-fallo { color: var(--color-fallo); border: 1px solid var(--color-fallo); box-shadow: 0 0 5px rgba(255, 65, 54, 0.5); }
 .badge-acierto { color: var(--color-acento); border: 1px solid var(--color-acento); box-shadow: 0 0 5px rgba(0, 255, 192, 0.5); }
+.badge-reaccion { color: var(--color-texto-claro); background-color: #303030; border: 1px solid var(--color-texto-claro); box-shadow: 0 0 5px rgba(224, 224, 224, 0.5); }
+#btn-reiniciar { padding: 10px 20px; margin-top: 30px; font-size: 1.1em; }
 
 /* Clase para ocultar elementos del juego */
 .oculto {
