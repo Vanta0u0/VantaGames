@@ -1,12 +1,14 @@
 :root {
-    --color-fondo: #121212;
-    --color-texto: #FFFFFF;
-    --color-acento: #00FFC0;
-    --color-verde-movimiento: #00CC00;
-    --color-fallo: #FF0000;
-    --color-gris-oscuro: #1a1a1a;
+    --color-fondo: #121212; 
+    --color-texto-claro: #E0E0E0; 
+    --color-acento: #00FFC0; 
+    --color-fallo: #FF4136; 
+    --color-verde-movimiento: #00CC00; /* Reutilizamos esta variable para efectos */
+    --color-gris-oscuro: #1a1a1a; /* Mantengo este color para el fondo de contadores/modales */
+    --color-fondo-columna: #1a1a1a; /* Uso consistente de tu nueva variable */
 }
 
+/* ESTILOS GLOBALES */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -15,38 +17,25 @@
 }
 
 body {
-    background-color: var(--color-fondo);
-    color: var(--color-texto);
-    display: flex;
+    background-color: var(--color-fondo); 
+    color: var(--color-texto-claro); 
+    min-height: 100vh;
+    display: flex; /* Necesario para centrar el modal de inicio */
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
     overflow: hidden; /* Evitar scrollbars causados por el círculo */
-    transition: background-color 0.15s ease-out;
+    transition: background-color 0.15s ease-out; 
 }
 
-/* --- CONTENEDOR PRINCIPAL DEL JUEGO --- */
+/* --- CONTENEDOR PRINCIPAL DEL JUEGO (Se usa como viewport del juego) --- */
 #main-container {
     width: 100%;
     height: 100vh;
     position: relative;
+    pointer-events: none; /* Permite que el clic atraviese si no hay círculo */
 }
 
-/* --- BOTÓN CÍRCULO --- */
-#btn-circulo {
-    position: fixed;
-    width: 80px; /* Tamaño PC por defecto (se ajusta por JS) */
-    height: 80px; /* Tamaño PC por defecto (se ajusta por JS) */
-    border-radius: 50%;
-    border: none;
-    background-color: var(--color-acento);
-    cursor: pointer;
-    box-shadow: 0 0 15px var(--color-acento);
-    transition: background-color 0.1s, box-shadow 0.1s, transform 0.1s;
-    touch-action: manipulation; /* Optimiza para dispositivos táctiles */
-}
-
-/* --- CONTADORES SUPERIORES --- */
+/* --- CONTADORES SUPERIORES AGRUPADOS --- */
 #contadores {
     position: fixed;
     top: 20px;
@@ -54,37 +43,70 @@ body {
     transform: translateX(-50%);
     display: flex;
     gap: 30px;
-    background-color: rgba(26, 26, 26, 0.7);
+    /* USO DE LA NUEVA VARIABLE: Fondo para contadores */
+    background-color: rgba(26, 26, 26, 0.7); /* Mantengo transparencia */
     padding: 10px 20px;
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     z-index: 1000;
+    pointer-events: none;
 }
 
 .contador {
     font-size: 1.2em;
     font-weight: bold;
-    color: var(--color-texto);
+    color: var(--color-texto-claro);
     padding: 5px 10px;
-    border: 2px solid var(--color-texto);
+    border: 2px solid var(--color-texto-claro);
     border-radius: 5px;
+    /* Los colores específicos se manejan por JS para Aciertos/Fallos/Tiempo */
 }
 
-/* --- MENSAJE DE FALLO --- */
+/* ESTILOS DE BASE PARA CONTADORES INTERNOS (Oculto) */
 #conteo-fallos {
-    position: fixed;
+    color: var(--color-fallo); 
+    display: none; 
+    position: fixed; /* Mantenemos el estilo fijo aunque se oculte */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 4em;
     font-weight: bold;
-    color: rgba(255, 0, 0, 0.8);
-    pointer-events: none; /* Asegura que no bloquee el clic */
-    z-index: 10;
     opacity: 0.1;
+    pointer-events: none;
+    z-index: 10;
 }
 
+/* CÍRCULO INTERACTIVO */
+#btn-circulo {
+    position: fixed; 
+    /* El tamaño es dinámico por JS */
+    width: 80px;  
+    height: 80px; 
+    border-radius: 50%; 
+    background-color: var(--color-acento); 
+    border: none;
+    cursor: pointer;
+    margin: 0; 
+    display: block; 
+    
+    /* MANTENEMOS LA TRANSICIÓN DE MOVIMIENTO */
+    transition: all 0.2s ease;
+    
+    pointer-events: auto; 
+    z-index: 900; 
+    box-shadow: 0 0 15px var(--color-acento); 
+    touch-action: manipulation; /* Optimiza para dispositivos táctiles */
+}
+
+#btn-circulo:hover {
+    background-color: #00E6B2; 
+    box-shadow: 0 0 25px var(--color-acento); 
+}
+
+/* ----------------------------------------------------------------- */
 /* --- MODALES GENERALES (Inicio y Fin) --- */
+/* ----------------------------------------------------------------- */
 .modal {
     position: fixed;
     top: 0;
@@ -99,13 +121,15 @@ body {
 }
 
 .modal-contenido {
-    background-color: var(--color-gris-oscuro);
+    /* USO DE LA NUEVA VARIABLE */
+    background-color: var(--color-fondo-columna); 
     border-radius: 15px;
     padding: 30px;
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
     text-align: center;
     max-height: 90vh;
     overflow-y: auto;
+    border: 2px solid var(--color-acento);
 }
 
 /* --- GRID DE INICIO (PC) --- */
@@ -115,66 +139,74 @@ body {
     gap: 20px;
     width: 80%;
     max-width: 1100px;
+    padding: 20px;
+    pointer-events: auto;
+    box-shadow: none; /* La sombra se aplica a la columna central */
+    border: none;
 }
 
 .modal-columna {
-    padding: 30px;
-    background-color: var(--color-gris-oscuro);
+    /* USO DE LA NUEVA VARIABLE */
+    background-color: var(--color-fondo-columna);
+    border: 2px solid var(--color-acento);
     border-radius: 10px;
-    min-width: 300px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 255, 192, 0.2);
+    flex: 1;
+    min-width: 250px;
+    position: relative;
+    max-width: 350px; /* Limitar el ancho en PC */
 }
 
-/* Columna Principal (Centro) */
+/* Estilos de la columna central */
 #principal-columna {
-    background-color: var(--color-fondo);
-    border: 3px solid var(--color-acento);
-    box-shadow: 0 0 40px var(--color-acento);
+    border-width: 3px;
+    box-shadow: 0 0 50px var(--color-acento);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     min-width: 350px;
+    background-color: var(--color-fondo); /* Columna central más oscura */
 }
 
-#principal-columna h2 {
-    font-size: 3em;
-    margin-bottom: 10px;
-    color: var(--color-acento);
+#principal-columna h2 { 
+    color: var(--color-acento); 
+    font-size: 2.8em; 
+    margin-bottom: 10px; 
 }
 
-#principal-columna p {
-    font-size: 1.1em;
-    margin-bottom: 30px;
-    color: #CCC;
-}
-
-/* Columnas Laterales (Explicación y Novedades) */
-.columna-flotante {
-    position: relative;
-    text-align: left;
+#principal-columna p { 
+    font-size: 1.2em; 
+    margin-bottom: 25px; 
+    color: var(--color-texto-claro);
 }
 
 .columna-titulo {
-    font-size: 1.5em;
-    margin-bottom: 15px;
-    border-bottom: 2px solid var(--color-acento);
-    padding-bottom: 5px;
     color: var(--color-acento);
+    font-size: 1.5em;
+    font-weight: bold;
+    border-bottom: 2px solid var(--color-acento);
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
 }
 
-.columna-flotante li {
-    margin-bottom: 8px;
+#explicacion-columna ol, #novedades-columna ul { 
+    text-align: left; 
+    padding-left: 20px; 
+    font-size: 1em; 
+}
+
+#explicacion-columna li, #novedades-columna li { 
+    margin-bottom: 8px; 
     line-height: 1.4;
 }
 
-/* Botones de Abrir Columna (Solo visible en PC, oculto en móvil) */
+/* Botones de Abrir Columna (Ocultos en PC, Innecesarios) */
 .btn-abrir-columna {
-    /* Mantenido para evitar errores, pero ocultado en la sección móvil */
-    display: block; 
-    visibility: hidden;
-    height: 0;
-    width: 0;
-    opacity: 0;
+    display: none !important;
 }
 
 /* Botón de Cerrar (Solo aparece en móvil) */
@@ -185,22 +217,29 @@ body {
 /* --- BOTÓN INICIAR/REINICIAR --- */
 .btn-principal {
     padding: 15px 30px;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: var(--color-gris-oscuro);
+    font-size: 1.3em;
     background-color: var(--color-acento);
+    color: var(--color-fondo); 
     border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
+    font-weight: bold;
 }
 
 .btn-principal:hover {
-    background-color: #00e6b5;
-    transform: translateY(-2px);
+    background-color: #00E6B2;
+    transform: scale(1.05);
 }
 
-/* --- MODAL FIN DE JUEGO --- */
+/* ----------------------------------------------------------------- */
+/* --- ESTILOS DEL MODAL DE FIN DE JUEGO --- */
+/* ----------------------------------------------------------------- */
+#modal-fin-juego .modal-contenido {
+    padding: 30px 50px;
+    box-shadow: 0 0 40px var(--color-acento);
+}
+
 .resultados-finales {
     margin: 20px 0;
     font-size: 1.2em;
@@ -212,15 +251,7 @@ body {
     margin: 15px 0;
 }
 
-/* --- UTILIDADES --- */
-.oculto {
-    display: none !important;
-}
-
-/* ----------------------------------------------------------------- */
 /* --- ESTILOS RESPONSIVOS: MÓVIL (Max 768px) --- */
-/* ----------------------------------------------------------------- */
-
 @media (max-width: 768px) {
     
     /* 1. COMPACTAR EL GRID PRINCIPAL */
@@ -237,12 +268,13 @@ body {
         padding: 15px; 
         min-width: unset;
         box-shadow: none;
+        max-width: 100%; /* Permitir que ocupe todo el ancho */
     }
 
     /* 2. COLUMNA PRINCIPAL (Centro) MÁS COMPACTA */
     #principal-columna {
         padding: 20px 15px; 
-        box-shadow: 0 0 30px var(--color-acento); /* Sutil sombra */
+        box-shadow: 0 0 30px var(--color-acento); 
         position: relative;
         z-index: 3002;
     }
@@ -254,20 +286,21 @@ body {
     .btn-principal {
         font-size: 1.3em;
         padding: 12px 25px;
-        width: 90%; /* Ajustar al ancho del contenedor */
+        width: 90%; 
     }
 
-    /* 3. COLUMNAS LATERALES (Explicación y Novedades) MÁS COMPACTAS */
+    /* 3. COLUMNAS LATERALES (Flotantes) */
     #explicacion-columna,
     #novedades-columna {
+        display: none; /* Por defecto ocultas, mostradas por JS */
         position: fixed;
         top: 0;
         left: 0;
         height: 100vh;
         background-color: var(--color-fondo);
         z-index: 3003;
-        padding: 50px 15px 15px 15px; /* Dejar espacio para el botón cerrar */
-        font-size: 0.95em; /* Reducir tamaño de fuente general */
+        padding: 50px 15px 15px 15px; /* Espacio para el botón cerrar */
+        font-size: 0.95em; 
         text-align: left;
     }
     
@@ -275,9 +308,9 @@ body {
     .columna-titulo { font-size: 1.4em; } 
     #explicacion-columna li, #novedades-columna li { font-size: 0.9em; margin-bottom: 4px; }
 
-    /* 4. MOVIMIENTO DE BOTONES DE CONTROL (Debajo del Cuadro Principal) */
+    /* 4. BOTONES DE CONTROL MÓVIL (Inyectados por JS) */
     
-    /* Ocultar botones de Abrir originales (solo existen para PC) */
+    /* Botones de Abrir originales (Si existieran en HTML, los ocultamos) */
     .btn-abrir-columna {
         display: none !important; 
     }
@@ -297,7 +330,7 @@ body {
     .btn-control-movil {
         padding: 10px;
         flex-grow: 1;
-        font-size: 0.85em; /* Reducir el texto de los botones de control */
+        font-size: 0.85em; 
         background-color: transparent;
         border: 1px solid var(--color-acento);
         color: var(--color-acento);
@@ -343,4 +376,9 @@ body {
     #control-movil-container {
         display: none !important;
     }
+}
+
+/* Clase para ocultar elementos del juego */
+.oculto {
+    display: none !important;
 }
