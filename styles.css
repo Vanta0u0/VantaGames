@@ -3,7 +3,7 @@
     --color-texto-claro: #E0E0E0; 
     --color-acento: #00FFC0; 
     --color-fallo: #FF4136; 
-    --color-fondo-columna: #1a1a1a; /* Fondo para las nuevas columnas */
+    --color-fondo-columna: #1a1a1a; 
 }
 
 /* ESTILOS GLOBALES */
@@ -17,7 +17,7 @@ body {
     transition: background-color 0.15s ease-out; 
 }
 
-/* CONTENEDOR PRINCIPAL: Zona del título */
+/* CONTENEDOR PRINCIPAL: Zona del título del juego */
 #main-container {
     width: 80%;
     max-width: 700px;
@@ -30,7 +30,6 @@ body {
     text-align: center;
     position: relative;
     z-index: 100;
-    
     pointer-events: none; 
 }
 
@@ -43,20 +42,13 @@ h1 {
     text-shadow: 0 0 10px rgba(0, 255, 192, 0.5); 
 }
 
-/* --- CONTADORES EXTERIORES (Sin cambios) --- */
-#conteo-fallos-exterior, #conteo-aciertos, #temporizador {
-    /* ... (Mantenemos los estilos de posición fija para los contadores) ... */
-    position: fixed; 
-    padding: 10px;
-    font-size: 1.2em;
-    background-color: var(--color-fondo-columna); 
-    border-radius: 5px;
-    z-index: 1000; 
-    pointer-events: none; 
-}
-#conteo-fallos-exterior { top: 20px; right: 20px; color: var(--color-fallo); border: 1px solid var(--color-fallo); }
-#conteo-aciertos { top: 80px; right: 20px; color: var(--color-acento); border: 1px solid var(--color-acento); }
-#temporizador { top: 20px; left: 20px; color: #FFFFFF; border: 1px solid #FFFFFF; }
+/* --- CONTADORES EXTERIORES --- */
+#conteo-fallos-exterior { position: fixed; top: 20px; right: 20px; padding: 10px; font-size: 1.2em; color: var(--color-fallo); background-color: var(--color-fondo-columna); border: 1px solid var(--color-fallo); border-radius: 5px; z-index: 1000; pointer-events: none; }
+#conteo-aciertos { position: fixed; top: 80px; right: 20px; padding: 10px; font-size: 1.2em; color: var(--color-acento); background-color: var(--color-fondo-columna); border: 1px solid var(--color-acento); border-radius: 5px; z-index: 1000; pointer-events: none; }
+#temporizador { position: fixed; top: 20px; left: 20px; padding: 10px; font-size: 1.2em; color: #FFFFFF; background-color: var(--color-fondo-columna); border: 1px solid #FFFFFF; border-radius: 5px; z-index: 1000; pointer-events: none; }
+
+/* Ocultar el contador interno de fallos */
+#conteo-fallos { color: var(--color-fallo); display: none; } 
 
 
 /* CÍRCULO INTERACTIVO */
@@ -70,7 +62,10 @@ h1 {
     position: fixed !important; 
     margin: 0; 
     display: block; 
+    
+    /* Transición de movimiento de 0.2s */
     transition: all 0.2s ease;
+    
     pointer-events: auto; 
     z-index: 900; 
     box-shadow: 0 0 15px var(--color-acento); 
@@ -82,7 +77,7 @@ h1 {
 }
 
 /* ----------------------------------------------------------------- */
-/* --- NUEVOS ESTILOS DEL MODAL DE INICIO: GRID DE 3 COLUMNAS --- */
+/* --- ESTILOS DEL MODAL DE INICIO: GRID DE 3 COLUMNAS --- */
 /* ----------------------------------------------------------------- */
 
 #modal-inicio-juego {
@@ -93,35 +88,47 @@ h1 {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.95); 
     display: flex; 
-    justify-content: center; /* Centrar todo el grid de 3 columnas */
+    justify-content: center; 
     align-items: center;
     z-index: 3000; 
 }
 
 #grid-inicio {
-    display: flex; /* Usar flexbox para las columnas */
-    gap: 20px; /* Espacio entre las columnas */
+    display: flex; 
+    gap: 20px; 
     padding: 40px;
     border-radius: 10px;
     pointer-events: auto;
     max-width: 90%; 
 }
 
+/* Estilo para los TRES cuadros de la pantalla de inicio */
 .modal-columna {
     background-color: var(--color-fondo-columna);
-    border: 1px solid var(--color-acento);
-    border-radius: 8px;
+    border: 2px solid var(--color-acento); 
+    border-radius: 10px; 
     padding: 25px;
     text-align: center;
     box-shadow: 0 0 30px rgba(0, 255, 192, 0.2); 
-    flex: 1; /* Ocupar el mismo espacio */
+    flex: 1; 
     min-width: 250px; 
+}
+
+/* Estilo para los títulos internos de las columnas laterales */
+.columna-titulo {
+    color: var(--color-acento);
+    font-size: 1.4em;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 255, 192, 0.3);
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
 }
 
 /* Estilos de la columna CENTRAL (Principal) */
 #principal-columna {
-    border-width: 3px; /* Más énfasis al centro */
-    box-shadow: 0 0 40px var(--color-acento);
+    border-width: 3px; /* Borde más grueso para destacar */
+    box-shadow: 0 0 50px var(--color-acento); /* Mayor sombra */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -139,17 +146,7 @@ h1 {
     margin-bottom: 25px;
 }
 
-/* Estilos generales para las columnas laterales */
-#explicacion-columna h3, #novedades-columna h3 {
-    color: var(--color-acento);
-    font-size: 1.5em;
-    border-bottom: 1px solid rgba(0, 255, 192, 0.3);
-    padding-bottom: 10px;
-    margin-top: 0;
-    margin-bottom: 15px;
-}
-
-/* Ajustes de listas y texto */
+/* Ajustes de listas (Instrucciones y Novedades) */
 #explicacion-columna ol, #novedades-columna ul {
     text-align: left;
     padding-left: 20px;
@@ -178,250 +175,32 @@ h1 {
     transform: scale(1.05);
 }
 
-/* --- ESTILOS DEL MODAL DE FIN DE JUEGO (Sin cambios) --- */
-#modal-fin-juego {
-    /* ... estilos de modal-fin-juego ... */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); 
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    z-index: 2000; 
+/* ----------------------------------------------------------------- */
+/* --- ESTILOS DEL MODAL DE FIN DE JUEGO --- */
+/* ----------------------------------------------------------------- */
+#modal-fin-juego { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background-color: rgba(0, 0, 0, 0.9); display: flex; 
+    justify-content: center; align-items: center; z-index: 2000; 
 }
-.modal-contenido {
-    /* ... estilos de modal-contenido ... */
-    background-color: #1a1a1a;
-    border: 2px solid var(--color-acento);
-    border-radius: 10px;
-    padding: 30px 50px;
-    text-align: center;
-    box-shadow: 0 0 40px var(--color-acento);
-    color: var(--color-texto-claro);
+
+.modal-contenido { 
+    background-color: #1a1a1a; border: 2px solid var(--color-acento); 
+    border-radius: 10px; padding: 30px 50px; text-align: center; 
+    box-shadow: 0 0 40px var(--color-acento); color: var(--color-texto-claro); 
     pointer-events: auto; 
 }
 
-/* ... (Resto de estilos de puntuación final, reiniciar, y clase oculto) ... */
+.modal-contenido h2 { color: var(--color-acento); font-size: 2em; margin-bottom: 20px; }
+.modal-contenido p { font-size: 1.3em; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; }
+
+/* Estilos para las puntuaciones finales (mini-contadores) */
 .final-score-badge { padding: 8px 15px; font-size: 1.2em; border-radius: 5px; margin-left: 10px; display: inline-block; font-weight: bold; background-color: #303030; }
 .badge-fallo { color: var(--color-fallo); border: 1px solid var(--color-fallo); box-shadow: 0 0 5px rgba(255, 65, 54, 0.5); }
 .badge-acierto { color: var(--color-acento); border: 1px solid var(--color-acento); box-shadow: 0 0 5px rgba(0, 255, 192, 0.5); }
 .badge-reaccion { color: var(--color-texto-claro); background-color: #303030; border: 1px solid var(--color-texto-claro); box-shadow: 0 0 5px rgba(224, 224, 224, 0.5); }
 #btn-reiniciar { padding: 10px 20px; margin-top: 30px; font-size: 1.1em; background-color: var(--color-acento); color: var(--color-fondo); border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, transform 0.1s; }
 #btn-reiniciar:hover { background-color: #00E6B2; transform: scale(1.05); }
-.oculto { display: none !important; }:root {
-    --color-fondo: #121212; 
-    --color-texto-claro: #E0E0E0; 
-    --color-acento: #00FFC0; 
-    --color-fallo: #FF4136; 
-    --color-fondo-columna: #1a1a1a; /* Fondo para las nuevas columnas */
-}
 
-/* ESTILOS GLOBALES */
-body {
-    background-color: var(--color-fondo); 
-    font-family: 'Arial', sans-serif;
-    color: var(--color-texto-claro); 
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    transition: background-color 0.15s ease-out; 
-}
-
-/* CONTENEDOR PRINCIPAL: Zona del título */
-#main-container {
-    width: 80%;
-    max-width: 700px;
-    padding: 40px;
-    border: 1px solid var(--color-acento); 
-    box-shadow: 0 0 50px rgba(0, 255, 192, 0.15); 
-    border-radius: 10px;
-    background-color: var(--color-fondo-columna); 
-    margin: 50px auto; 
-    text-align: center;
-    position: relative;
-    z-index: 100;
-    
-    pointer-events: none; 
-}
-
-h1 {
-    color: var(--color-acento); 
-    text-align: center;
-    border-bottom: 2px solid var(--color-acento); 
-    padding-bottom: 15px;
-    margin-bottom: 30px;
-    text-shadow: 0 0 10px rgba(0, 255, 192, 0.5); 
-}
-
-/* --- CONTADORES EXTERIORES (Sin cambios) --- */
-#conteo-fallos-exterior, #conteo-aciertos, #temporizador {
-    /* ... (Mantenemos los estilos de posición fija para los contadores) ... */
-    position: fixed; 
-    padding: 10px;
-    font-size: 1.2em;
-    background-color: var(--color-fondo-columna); 
-    border-radius: 5px;
-    z-index: 1000; 
-    pointer-events: none; 
-}
-#conteo-fallos-exterior { top: 20px; right: 20px; color: var(--color-fallo); border: 1px solid var(--color-fallo); }
-#conteo-aciertos { top: 80px; right: 20px; color: var(--color-acento); border: 1px solid var(--color-acento); }
-#temporizador { top: 20px; left: 20px; color: #FFFFFF; border: 1px solid #FFFFFF; }
-
-
-/* CÍRCULO INTERACTIVO */
-#btn-circulo {
-    width: 80px;  
-    height: 80px; 
-    border-radius: 50%; 
-    background-color: var(--color-acento); 
-    border: none;
-    cursor: pointer;
-    position: fixed !important; 
-    margin: 0; 
-    display: block; 
-    transition: all 0.2s ease;
-    pointer-events: auto; 
-    z-index: 900; 
-    box-shadow: 0 0 15px var(--color-acento); 
-}
-
-#btn-circulo:hover {
-    background-color: #00E6B2; 
-    box-shadow: 0 0 25px var(--color-acento); 
-}
-
-/* ----------------------------------------------------------------- */
-/* --- NUEVOS ESTILOS DEL MODAL DE INICIO: GRID DE 3 COLUMNAS --- */
-/* ----------------------------------------------------------------- */
-
-#modal-inicio-juego {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.95); 
-    display: flex; 
-    justify-content: center; /* Centrar todo el grid de 3 columnas */
-    align-items: center;
-    z-index: 3000; 
-}
-
-#grid-inicio {
-    display: flex; /* Usar flexbox para las columnas */
-    gap: 20px; /* Espacio entre las columnas */
-    padding: 40px;
-    border-radius: 10px;
-    pointer-events: auto;
-    max-width: 90%; 
-}
-
-.modal-columna {
-    background-color: var(--color-fondo-columna);
-    border: 1px solid var(--color-acento);
-    border-radius: 8px;
-    padding: 25px;
-    text-align: center;
-    box-shadow: 0 0 30px rgba(0, 255, 192, 0.2); 
-    flex: 1; /* Ocupar el mismo espacio */
-    min-width: 250px; 
-}
-
-/* Estilos de la columna CENTRAL (Principal) */
-#principal-columna {
-    border-width: 3px; /* Más énfasis al centro */
-    box-shadow: 0 0 40px var(--color-acento);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-#principal-columna h2 {
-    color: var(--color-acento);
-    font-size: 2.8em;
-    margin-bottom: 10px;
-}
-
-#principal-columna p {
-    font-size: 1.2em;
-    margin-bottom: 25px;
-}
-
-/* Estilos generales para las columnas laterales */
-#explicacion-columna h3, #novedades-columna h3 {
-    color: var(--color-acento);
-    font-size: 1.5em;
-    border-bottom: 1px solid rgba(0, 255, 192, 0.3);
-    padding-bottom: 10px;
-    margin-top: 0;
-    margin-bottom: 15px;
-}
-
-/* Ajustes de listas y texto */
-#explicacion-columna ol, #novedades-columna ul {
-    text-align: left;
-    padding-left: 20px;
-    font-size: 1em;
-}
-
-#explicacion-columna li, #novedades-columna li {
-    margin-bottom: 8px;
-}
-
-/* Estilo para el botón de inicio */
-#btn-iniciar {
-    padding: 15px 30px;
-    font-size: 1.3em;
-    background-color: var(--color-acento);
-    color: var(--color-fondo); 
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    font-weight: bold;
-}
-
-#btn-iniciar:hover {
-    background-color: #00E6B2;
-    transform: scale(1.05);
-}
-
-/* --- ESTILOS DEL MODAL DE FIN DE JUEGO (Sin cambios) --- */
-#modal-fin-juego {
-    /* ... estilos de modal-fin-juego ... */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); 
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    z-index: 2000; 
-}
-.modal-contenido {
-    /* ... estilos de modal-contenido ... */
-    background-color: #1a1a1a;
-    border: 2px solid var(--color-acento);
-    border-radius: 10px;
-    padding: 30px 50px;
-    text-align: center;
-    box-shadow: 0 0 40px var(--color-acento);
-    color: var(--color-texto-claro);
-    pointer-events: auto; 
-}
-
-/* ... (Resto de estilos de puntuación final, reiniciar, y clase oculto) ... */
-.final-score-badge { padding: 8px 15px; font-size: 1.2em; border-radius: 5px; margin-left: 10px; display: inline-block; font-weight: bold; background-color: #303030; }
-.badge-fallo { color: var(--color-fallo); border: 1px solid var(--color-fallo); box-shadow: 0 0 5px rgba(255, 65, 54, 0.5); }
-.badge-acierto { color: var(--color-acento); border: 1px solid var(--color-acento); box-shadow: 0 0 5px rgba(0, 255, 192, 0.5); }
-.badge-reaccion { color: var(--color-texto-claro); background-color: #303030; border: 1px solid var(--color-texto-claro); box-shadow: 0 0 5px rgba(224, 224, 224, 0.5); }
-#btn-reiniciar { padding: 10px 20px; margin-top: 30px; font-size: 1.1em; background-color: var(--color-acento); color: var(--color-fondo); border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, transform 0.1s; }
-#btn-reiniciar:hover { background-color: #00E6B2; transform: scale(1.05); }
+/* Clase para ocultar elementos del juego */
 .oculto { display: none !important; }
