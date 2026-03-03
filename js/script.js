@@ -29,11 +29,12 @@ const SHADOW_ACENTO = '0 0 15px ' + COLOR_ACENTO;
 const SHADOW_VERDE = '0 0 15px ' + COLOR_VERDE_MOVIMIENTO;
 
 // -----------------------------------------------------
-// [NUEVO] FUNCIONES ADITIVAS PARA BLINK EDITION
+// [AÑADIDO] MOTOR DE AUDIO BLINK EDITION (ADITIVO)
 // -----------------------------------------------------
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioCtx;
 function sonarBlink(frecuencia, tipo, duracion) {
     try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -278,10 +279,10 @@ document.addEventListener('DOMContentLoaded', function() {
         botonCirculo.style.left = `${nuevoX}px`;
         botonCirculo.style.top = `${nuevoY}px`;
         
-        // [NUEVO] Feedback de aparición para evitar Blink Atencional
-        sonarBlink(600, 'sine', 0.1);
+        // [AÑADIDO] Feedback Blink Edition
+        sonarBlink(600, 'sine', 0.1); // Tono de aparición
         botonCirculo.classList.remove('blink-active');
-        void botonCirculo.offsetWidth; 
+        void botonCirculo.offsetWidth; // Trigger de reflow para reiniciar animación
         botonCirculo.classList.add('blink-active');
 
         // REGISTRA EL TIEMPO INSTANTÁNEO EN QUE EL CÍRCULO LLEGÓ A SU NUEVA POSICIÓN
@@ -299,10 +300,10 @@ document.addEventListener('DOMContentLoaded', function() {
         aciertos++;
         conteoAciertosDisplay.textContent = `Aciertos: ${aciertos}`;
         conteoAciertosDisplay.style.backgroundColor = '#202020';
-        
-        // [NUEVO] Sonido de Acierto
-        sonarBlink(880, 'sine', 0.1);
 
+        // [AÑADIDO] Sonido de acierto
+        sonarBlink(880, 'sine', 0.1);
+        
         botonCirculo.style.backgroundColor = COLOR_VERDE_MOVIMIENTO;
         botonCirculo.style.boxShadow = SHADOW_VERDE;
         
@@ -330,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (event.target.id !== 'btn-circulo') {
             fallos++;
             
-            // [NUEVO] Sonido de Fallo
+            // [AÑADIDO] Sonido de fallo
             sonarBlink(200, 'square', 0.15);
 
             conteoFallosDisplayInterno.textContent = `Fallos: ${fallos}`;
