@@ -91,4 +91,21 @@ h1 { color: var(--color-acento); text-align: center; border-bottom: 2px solid va
     display: flex; flex-direction: column; justify-content: center; align-items: center; 
 }
 #principal-columna h2 { color: var(--color-acento); font-size: 2.8em; margin-bottom: 10px; }
-#principal-columna p { font-size: 1.2em
+#principal-columna p { font-size: 1.2em; margin-bottom: 25px; }
+#explicacion-columna ol, #novedades-columna ul { text-align: left; padding-left: 20px; font-size: 1em; }
+#explicacion-columna li, #novedades-columna li { margin-bottom: 8px; }
+
+#btn-iniciar { 
+    padding: 15px 30px; font-size: 1.3em; 
+    background-color: var(--color-acento); color: var(--color-fondo); 
+    border: none; border-radius: 8px; cursor: pointer; 
+    transition: background-color 0.2s, transform 0.1s; font-weight: bold; 
+}
+#btn-iniciar:hover { background-color: #00E6B2; transform: scale(1.05); }
+
+
+/* --- ESTILOS DEL MODAL DE FIN DE JUEGO --- */
+#modal-fin-juego { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+.modal-contenido { background-color: #1a1a1a; border: 2px solid var(--color-acento); border-radius: 10px; padding: 30px 50px; text-align: center; box-shadow: 0 0 40px var(--color-acento); color: var(--color-texto-claro); pointer-events: auto; }
+
+.final-score-badge { padding: 8px 15px; font-size: 1.2em; border-radius: 5px; margin-
