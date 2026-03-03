@@ -6,11 +6,11 @@
     <title>Reaction Trainer - Blink Edition</title>
     
     <style>
-        body { background-color: #121212; color: #E0E0E0; margin: 0; }
+        body { background-color: #121212 !important; color: #E0E0E0 !important; margin: 0; }
         .oculto { display: none !important; }
     </style>
-    
-    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -34,12 +34,10 @@
                     <li>Si fallas el clic, el fondo parpadeará en rojo.</li>
                 </ol>
             </div>
-
             <div class="modal-columna" id="principal-columna">
                 <h2>¿Listo?</h2>
                 <button id="btn-iniciar">INICIAR JUEGO</button>
             </div>
-
             <div class="modal-columna" id="novedades-columna">
                 <p class="columna-titulo">Blink Edition</p>
                 <ul>
@@ -52,7 +50,7 @@
 
     <div id="modal-fin-juego" class="oculto">
         <div class="modal-contenido">
-            <h2>¡Tiempo Agotado!</h2>
+            <h2>¡Fin del Juego!</h2>
             <p>Aciertos: <span id="final-aciertos" class="final-score-badge badge-acierto">0</span></p>
             <p>Fallos: <span id="final-fallos" class="final-score-badge badge-fallo">0</span></p>
             <div id="tiempo-reaccion-estimado" class="final-score-badge badge-reaccion">0 ms</div>
