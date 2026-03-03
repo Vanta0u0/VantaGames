@@ -3,59 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego de Reacción Extrema - Pro</title>
-    <link rel="stylesheet" href="style.css"> 
+    <title>Juego de Reacción Extrema</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="main-container" class="oculto">
         <h1>Juego de Reacción Extrema</h1>
-        <button id="btn-circulo" class="oculto"></button>
     </div>
+
+    <button id="btn-circulo" class="oculto"></button>
 
     <div id="temporizador" class="oculto">1:00</div>
     <div id="conteo-aciertos" class="oculto">Aciertos: 0</div>
     <div id="conteo-fallos-exterior" class="oculto">Fallos Totales: 0</div>
-    <div id="conteo-fallos" class="oculto">¡FALLO!</div>
+    <div id="conteo-fallos">¡FALLO!</div>
 
-    <div id="modal-inicio-juego" class="modal">
+    <div id="modal-inicio-juego">
         <div id="grid-inicio">
             <div id="explicacion-columna" class="modal-columna">
-                <button class="btn-cerrar-columna oculto">X</button>
                 <h3 class="columna-titulo">📚 Reglas</h3>
                 <ol>
-                    <li>Toca el círculo antes de que se mueva solo.</li>
-                    <li>Si fallas el fondo, se registra el error.</li>
-                    <li>A los 25 aciertos, verás un flash de celebración.</li>
+                    <li>Haz clic en el círculo antes de que se mueva solo.</li>
+                    <li>No hagas clic fuera o sumarás un fallo.</li>
+                    <li>A los 25 aciertos recibirás una señal visual.</li>
                 </ol>
             </div>
             
             <div id="principal-columna" class="modal-columna">
-                <h2>Reacción Extrema</h2>
-                <p>Mide tu velocidad. El juego se detendrá si detecta una TR Extrema.</p>
+                <h2>Reacción</h2>
+                <p>Mide tu velocidad de procesamiento.</p>
                 <button id="btn-iniciar">INICIAR JUEGO</button>
-                <div id="control-movil-container" class="oculto"></div>
             </div>
             
             <div id="novedades-columna" class="modal-columna">
-                <button class="btn-cerrar-columna oculto">X</button>
                 <h3 class="columna-titulo">✨ Sistema</h3>
                 <ul>
-                    <li>Audio-guía contra el parpadeo atencional.</li>
-                    <li>Dificultad adaptativa (Móvil/PC).</li>
-                    <li>Cálculo de TR Promedio en tiempo real.</li>
+                    <li>Audio contra parpadeo atencional.</li>
+                    <li>Dificultad progresiva a los 10s.</li>
+                    <li>Detección de TR Extrema.</li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <div id="modal-fin-juego" class="modal oculto">
+    <div id="modal-fin-juego" class="oculto">
         <div class="modal-contenido">
             <h2>Resultados</h2>
             <p>Aciertos: <span id="final-aciertos" class="final-score-badge badge-acierto">0</span></p>
             <p>Fallos: <span id="final-fallos" class="final-score-badge badge-fallo">0</span></p>
             <p>TR Promedio: <span id="tiempo-reaccion-estimado" class="final-score-badge badge-reaccion">0 ms</span></p>
-            <button id="btn-reiniciar">REINTENTAR</button>
+            <button id="btn-reiniciar">REINICIAR</button>
         </div>
     </div>
 
