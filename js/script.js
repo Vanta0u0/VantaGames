@@ -29,29 +29,38 @@ const SHADOW_ACENTO = '0 0 15px ' + COLOR_ACENTO;
 const SHADOW_VERDE = '0 0 15px ' + COLOR_VERDE_MOVIMIENTO;
 
 // -----------------------------------------------------
-// [NUEVO] MOTOR DE AUDIO PARA MITIGAR EL BLINK ATENCIONAL
+// [NUEVO] FUNCIONES ADITIVAS PARA BLINK EDITION
 // -----------------------------------------------------
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function sonarBlink(frecuencia, tipo, duracion) {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = tipo;
-    osc.frequency.setValueAtTime(frecuencia, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duracion);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + duracion);
+    try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = tipo;
+        osc.frequency.setValueAtTime(frecuencia, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duracion);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + duracion);
+    } catch (e) { console.log("Audio esperando interacción"); }
 }
 
 // -----------------------------------------------------
 // FUNCIONES DE CÁLCULO DE PUNTUACIÓN
 // -----------------------------------------------------
 function calcularTiempoReaccionPromedio() {
+    // Calcula el tiempo de reacción promedio (en ms).
+    // Ya no se aplica penalización por fallos.
+    
     if (aciertos === 0) {
+        // Si no hay aciertos, devuelve un valor alto para evitar división por cero.
         return 9999.00.toFixed(2);
     }
+    
+    // El promedio es el tiempo total de aciertos dividido por el número de aciertos.
     const promedio = sumaTiemposReaccion / aciertos;
+    
     return promedio.toFixed(2);
 }
 
@@ -83,46 +92,61 @@ document.addEventListener('DOMContentLoaded', function() {
         botonCirculo, mainContainer
     ];
     
+    // -----------------------------------------------------
+    // LÓGICA DE DETECCIÓN Y AJUSTE DE DIFICULTAD
+    // -----------------------------------------------------
     function aplicarAjusteMovil() {
         if (window.innerWidth <= MOBILE_BREAKPOINT) {
             currentInactivityTime = MOBILE_INACTIVITY_MS;
+            
             botonCirculo.style.width = CIRCLE_SIZE_MOBILE;
             botonCirculo.style.height = CIRCLE_SIZE_MOBILE;
             centrarCirculo(); 
+            
         } else {
             currentInactivityTime = PC_INACTIVITY_MS;
             botonCirculo.style.width = CIRCLE_SIZE_PC;
             botonCirculo.style.height = CIRCLE_SIZE_PC;
         }
     }
-
+    // -----------------------------------------------------
+    
+    
     function centrarCirculo() {
         botonCirculo.style.position = 'fixed'; 
+
         const anchoVentana = window.innerWidth;
         const altoVentana = window.innerHeight;
         const anchoCirculo = botonCirculo.clientWidth; 
         const altoCirculo = botonCirculo.clientHeight;
+
         const nuevoX = (anchoVentana / 2) - (anchoCirculo / 2);
         const nuevoY = (altoVentana / 2) - (altoCirculo / 2);
+        
         botonCirculo.style.left = `${nuevoX}px`;
         botonCirculo.style.top = `${nuevoY}px`;
     }
 
     function inicializarPantalla() {
         elementosDelJuego.forEach(el => el.classList.add('oculto'));
+        
         aplicarAjusteMovil();
         centrarCirculo();
+        
         window.addEventListener('resize', () => {
              aplicarAjusteMovil();
              centrarCirculo();
         });
+        
         actualizarContadores();
         actualizarTemporizadorDisplay(); 
     }
 
     function iniciarJuego() {
         elementosDelJuego.forEach(el => el.classList.remove('oculto'));
+
         modalInicioJuego.style.display = 'none';
+
         iniciarTemporizadorCountdown(); 
     }
 
@@ -172,17 +196,21 @@ document.addEventListener('DOMContentLoaded', function() {
         temporizadorDisplay.textContent = "¡FIN!";
         temporizadorDisplay.style.color = COLOR_ACENTO;
         temporizadorDisplay.style.borderColor = COLOR_ACENTO;
+        
         clearTimeout(movementTimerId); 
+        
         botonCirculo.style.display = 'none';
 
         const tiempoReaccionFinal = calcularTiempoReaccionPromedio(); 
         const tiempoEstimadoNumber = parseFloat(tiempoReaccionFinal); 
 
+        // LÓGICA DE CIERRE AUTOMÁTICO (Si el tiempo promedio es extremadamente bajo)
         if (tiempoEstimadoNumber <= 90.00) { 
             modalFinJuego.style.display = 'flex';
             modalFinJuego.style.pointerEvents = 'none'; 
+            
             modalContenidoFin.innerHTML = `
-                <div class="tr-extrema-container">
+                <div style="color: #FFD700; border: 2px solid #FFD700; border-radius: 10px; padding: 20px; box-shadow: 0 0 20px #FFD700;">
                     <h2>¡TIEMPO DE REACCIÓN EXTREMO!</h2>
                     <p>Tu tiempo de reacción promedio fue de:</p>
                     <p style="font-size: 2em; font-weight: bold; margin: 15px 0;">
@@ -194,10 +222,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     </p>
                 </div>
             `;
+            
         } else {
+            // Flujo Normal de Fin de Juego
             finalAciertosDisplay.textContent = aciertos;
             finalFallosDisplay.textContent = fallos;
             tiempoReaccionEstimadoDisplay.textContent = `${tiempoReaccionFinal} ms`;
+            
             btnReiniciar.style.display = 'block'; 
             modalFinJuego.style.pointerEvents = 'auto'; 
             modalFinJuego.style.display = 'flex';
@@ -208,31 +239,32 @@ document.addEventListener('DOMContentLoaded', function() {
         aciertos = 0;
         fallos = 0;
         tiempoRestante = 60;
-        sumaTiemposReaccion = 0;
+        sumaTiemposReaccion = 0; // Reinicia la suma de tiempos
+
         clearTimeout(movementTimerId);
         clearInterval(countdownTimerId); 
+
         modalFinJuego.style.display = 'none';
         botonCirculo.style.display = 'block';
+
         aplicarAjusteMovil(); 
         centrarCirculo();
+
         actualizarContadores();
         actualizarTemporizadorDisplay();
+        
         iniciarTemporizadorCountdown(); 
     }
 
     function resetMovementTimer() {
         clearTimeout(movementTimerId);
         
-        // [NUEVO] Dificultad Dinámica Blink: 
-        // Si hay racha de aciertos perfecta tras 10s, reducimos ligeramente el tiempo de espera
-        let factorDificultad = (60 - tiempoRestante >= 10 && fallos === 0) ? 0.85 : 1.0;
-
         movementTimerId = setTimeout(() => {
             moverCirculoAleatoriamente();
             botonCirculo.style.backgroundColor = COLOR_ACENTO; 
             botonCirculo.style.boxShadow = SHADOW_ACENTO;
             resetMovementTimer(); 
-        }, currentInactivityTime * factorDificultad);
+        }, currentInactivityTime);
     }
 
     function moverCirculoAleatoriamente() {
@@ -246,18 +278,21 @@ document.addEventListener('DOMContentLoaded', function() {
         botonCirculo.style.left = `${nuevoX}px`;
         botonCirculo.style.top = `${nuevoY}px`;
         
-        // [NUEVO] Feedback Blink: Sonido y pulso visual al aparecer
-        sonarBlink(650, 'sine', 0.08);
+        // [NUEVO] Feedback de aparición para evitar Blink Atencional
+        sonarBlink(600, 'sine', 0.1);
         botonCirculo.classList.remove('blink-active');
-        void botonCirculo.offsetWidth; // Forzar reflow para reiniciar animación
+        void botonCirculo.offsetWidth; 
         botonCirculo.classList.add('blink-active');
 
+        // REGISTRA EL TIEMPO INSTANTÁNEO EN QUE EL CÍRCULO LLEGÓ A SU NUEVA POSICIÓN
         tiempoMovimiento = performance.now();
     }
+
 
     function manejarAcierto() {
         if (tiempoRestante === 0 || !juegoActivo) return;
 
+        // CALCULAR EL TIEMPO DE REACCIÓN
         const tiempoReaccion = performance.now() - tiempoMovimiento;
         sumaTiemposReaccion += tiempoReaccion; 
         
@@ -265,8 +300,8 @@ document.addEventListener('DOMContentLoaded', function() {
         conteoAciertosDisplay.textContent = `Aciertos: ${aciertos}`;
         conteoAciertosDisplay.style.backgroundColor = '#202020';
         
-        // [NUEVO] Audio de Acierto
-        sonarBlink(900, 'sine', 0.1);
+        // [NUEVO] Sonido de Acierto
+        sonarBlink(880, 'sine', 0.1);
 
         botonCirculo.style.backgroundColor = COLOR_VERDE_MOVIMIENTO;
         botonCirculo.style.boxShadow = SHADOW_VERDE;
@@ -295,8 +330,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (event.target.id !== 'btn-circulo') {
             fallos++;
             
-            // [NUEVO] Audio de Fallo
-            sonarBlink(180, 'square', 0.15);
+            // [NUEVO] Sonido de Fallo
+            sonarBlink(200, 'square', 0.15);
 
             conteoFallosDisplayInterno.textContent = `Fallos: ${fallos}`;
             conteoFallosDisplayExterno.textContent = `Fallos Totales: ${fallos}`; 
@@ -317,6 +352,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // -----------------------------------------------------
+    // EVENT LISTENERS Y LLAMADAS INICIALES
+    // -----------------------------------------------------
     botonCirculo.addEventListener('click', manejarAcierto);
     cuerpoPagina.addEventListener('click', manejarFallo);
     btnReiniciar.addEventListener('click', reiniciarJuego); 
