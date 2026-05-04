@@ -3,51 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Reaction Trainer - GitHub Edition</title>
-    <!-- Enlace estricto para evitar bloqueos en GitHub -->
+    <title>Reaction Trainer - Final Stable Build</title>
+    <!-- Enlace directo sin ./ para máxima compatibilidad con GitHub -->
     <link rel="stylesheet" type="text/css" href="style.css">
-    <style>
-        /* Estilo de seguridad: oculta el body hasta que el CSS cargue para evitar la "pantalla blanca" */
-        body { opacity: 0; background-color: #0a0a0a; transition: opacity 0.5s; }
-    </style>
 </head>
-<body onload="document.body.style.opacity='1'">
+<body>
 
-    <div id="ui-container" class="oculto">
-        <div id="temporizador">0:60</div>
-        <div id="conteo-fallos-exterior">Fallos: 0</div>
-        <div id="conteo-aciertos">Aciertos: 0</div>
-    </div>
+    <!-- Capa de Seguridad para evitar parpadeos -->
+    <div id="game-viewport">
+        <div id="ui-layer" class="hidden">
+            <div id="temporizador">0:60</div>
+            <div id="conteo-fallos">Fallos: 0</div>
+            <div id="conteo-aciertos">Aciertos: 0</div>
+        </div>
 
-    <button id="btn-circulo" class="oculto"></button>
+        <button id="target" class="hidden"></button>
 
-    <div id="modal-inicio-juego" class="modal">
-        <div class="modal-contenido">
-            <h1 class="titulo-neon">REACTION TRAINER</h1>
-            <div id="grid-inicio" class="pc-layout">
-                <div class="modal-columna">
-                    <h3>SISTEMA PC</h3>
-                    <p>Optimizado para procesadores multinúcleo.</p>
+        <div id="menu-inicio" class="modal">
+            <div class="modal-box">
+                <h1 class="neon-text">REACTION PRO</h1>
+                <div id="device-info">
+                    <div class="info-card">
+                        <h4>HARDWARE</h4>
+                        <p>Ryzen 5 / Radeon RX Detected</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>SYNC</h4>
+                        <p>GitHub Pages Optimized</p>
+                    </div>
                 </div>
-                <div class="modal-columna">
-                    <h3>SISTEMA MÓVIL</h3>
-                    <p>Detección de latencia táctil activa.</p>
-                </div>
+                <button id="start-trigger">INICIAR SESIÓN</button>
             </div>
-            <button id="btn-iniciar">INICIAR PRUEBA</button>
+        </div>
+
+        <div id="menu-fin" class="modal hidden">
+            <div class="modal-box">
+                <h2>RESULTADOS</h2>
+                <p>Aciertos: <span id="res-aciertos">0</span></p>
+                <p>Fallos: <span id="res-fallos">0</span></p>
+                <p>Velocidad: <span id="res-ms">0</span> ms</p>
+                <button onclick="location.reload()">REINTENTAR</button>
+            </div>
         </div>
     </div>
 
-    <div id="modal-fin-juego" class="modal oculto">
-        <div class="modal-contenido">
-            <h2>RESULTADOS FINALES</h2>
-            <p>Aciertos: <span id="final-aciertos">0</span></p>
-            <p>Reacción Media: <span id="tiempo-reaccion-estimado">0</span> ms</p>
-            <button onclick="location.reload()">REINTENTAR</button>
-        </div>
-    </div>
-
-    <!-- El Script al final garantiza que el HTML ya exista antes de ejecutarse -->
     <script src="script.js"></script>
 </body>
 </html>
