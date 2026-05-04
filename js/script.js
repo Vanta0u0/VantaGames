@@ -1,113 +1,118 @@
 const CONFIG = {
-    LIMIT_MOBILE: 768,
-    SIZE_PC: 85,
-    SIZE_MOBILE: 70,
-    SAFE_ZONE: 50
+    MOBILE_BREAKPOINT: 768,
+    PC_SIZE: 80,
+    MOBILE_SIZE: 65,
+    GAME_DURATION: 60,
+    BOT_THRESHOLD: 95 // ms para detectar posible bot
 };
 
-let gameState = {
-    running: false,
+let game = {
+    active: false,
     score: 0,
     misses: 0,
-    timeLeft: 60,
-    reactionSum: 0,
+    time: CONFIG.GAME_DURATION,
+    totalReaction: 0,
     lastSpawn: 0,
-    currentCircleSize: CONFIG.SIZE_PC
+    currentSize: CONFIG.PC_SIZE
 };
 
-function adjustToHardware() {
+// Sincronización de hardware
+function syncHardware() {
     const grid = document.getElementById('grid-inicio');
-    const isMobile = window.innerWidth <= CONFIG.LIMIT_MOBILE;
+    const isMobile = window.innerWidth <= CONFIG.MOBILE_BREAKPOINT;
     
-    if (isMobile) {
-        grid.className = 'mobile-layout';
-        gameState.currentCircleSize = CONFIG.SIZE_MOBILE;
-    } else {
-        grid.className = 'pc-layout';
-        gameState.currentCircleSize = CONFIG.SIZE_PC;
+    if (grid) {
+        grid.className = isMobile ? 'mobile-layout' : 'pc-layout';
     }
+    game.currentSize = isMobile ? CONFIG.MOBILE_SIZE : CONFIG.PC_SIZE;
 }
 
+// Generación de objetivo evitando la UI
 function spawnTarget() {
-    if (!gameState.running) return;
+    if (!game.active) return;
     const btn = document.getElementById('btn-circulo');
     
-    // Obtener áreas de la UI para evitar colisión
-    const uiBoxes = Array.from(document.querySelectorAll('#ui-container div:not(.oculto)'))
-                        .map(el => el.getBoundingClientRect());
+    const hudElements = Array.from(document.querySelectorAll('#ui-container div:not(.oculto)'))
+                             .map(el => el.getBoundingClientRect());
 
-    let x, y, isSafe = false;
+    let x, y, safe = false;
     let attempts = 0;
 
-    while (!isSafe && attempts < 100) {
-        x = Math.random() * (window.innerWidth - gameState.currentCircleSize);
-        y = Math.random() * (window.innerHeight - gameState.currentCircleSize);
+    while (!safe && attempts < 50) {
+        x = Math.random() * (window.innerWidth - game.currentSize);
+        y = Math.random() * (window.innerHeight - game.currentSize);
         
-        const circleRect = {
-            left: x - 10, right: x + gameState.currentCircleSize + 10,
-            top: y - 10, bottom: y + gameState.currentCircleSize + 10
-        };
-
-        isSafe = !uiBoxes.some(ui => 
-            circleRect.left < ui.right && circleRect.right > ui.left &&
-            circleRect.top < ui.bottom && circleRect.bottom > ui.top
+        const rect = { left: x - 20, right: x + game.currentSize + 20, top: y - 20, bottom: y + game.currentSize + 20 };
+        
+        safe = !hudElements.some(hud => 
+            rect.left < hud.right && rect.right > hud.left &&
+            rect.top < hud.bottom && rect.bottom > hud.top
         );
         attempts++;
     }
 
-    btn.style.width = gameState.currentCircleSize + "px";
-    btn.style.height = gameState.currentCircleSize + "px";
+    btn.style.width = game.currentSize + "px";
+    btn.style.height = game.currentSize + "px";
     btn.style.left = x + "px";
     btn.style.top = y + "px";
-    gameState.lastSpawn = performance.now();
+    game.lastSpawn = performance.now();
 }
 
-// Inicialización Segura
 window.onload = () => {
-    adjustToHardware();
-    window.onresize = adjustToHardware;
+    syncHardware();
+    window.addEventListener('resize', syncHardware);
 
     document.getElementById('btn-iniciar').onclick = () => {
-        gameState.running = true;
+        game.active = true;
         document.getElementById('modal-inicio-juego').classList.add('oculto');
         document.getElementById('btn-circulo').classList.remove('oculto');
         document.querySelectorAll('#ui-container div').forEach(el => el.classList.remove('oculto'));
         
         spawnTarget();
 
-        const timerInterval = setInterval(() => {
-            gameState.timeLeft--;
-            document.getElementById('temporizador').innerText = `0:${gameState.timeLeft.toString().padStart(2, '0')}`;
-            
-            if (gameState.timeLeft <= 0) {
-                clearInterval(timerInterval);
-                endGame();
+        const timer = setInterval(() => {
+            if (!game.active) {
+                clearInterval(timer);
+                return;
             }
+            game.time--;
+            document.getElementById('temporizador').innerText = `0:${game.time.toString().padStart(2, '0')}`;
+            if (game.time <= 0) endGame();
         }, 1000);
     };
 
     document.getElementById('btn-circulo').onclick = (e) => {
         e.stopPropagation();
-        gameState.reactionSum += (performance.now() - gameState.lastSpawn);
-        gameState.score++;
-        document.getElementById('conteo-aciertos').innerText = `Aciertos: ${gameState.score}`;
+        const reactionTime = performance.now() - game.lastSpawn;
+        
+        // Anti-Bot / Seguridad de juego
+        if (reactionTime < CONFIG.BOT_THRESHOLD) {
+            console.warn("Detección de bot: Reacción demasiado rápida.");
+        }
+
+        game.totalReaction += reactionTime;
+        game.score++;
+        document.getElementById('conteo-aciertos').innerText = `Aciertos: ${game.score}`;
         spawnTarget();
     };
 
+    // Penalización por fallar el clic
     document.body.onclick = () => {
-        if (!gameState.running) return;
-        gameState.misses++;
-        document.getElementById('conteo-fallos-exterior').innerText = `Fallos: ${gameState.misses}`;
-        document.body.style.backgroundColor = "#300";
-        setTimeout(() => document.body.style.backgroundColor = var(--fondo), 80);
+        if (!game.active) return;
+        game.misses++;
+        document.getElementById('conteo-fallos-exterior').innerText = `Fallos: ${game.misses}`;
+        document.body.style.backgroundColor = "#400";
+        setTimeout(() => document.body.style.backgroundColor = "#0a0a0a", 80);
     };
 };
 
 function endGame() {
-    gameState.running = false;
+    game.active = false;
     document.getElementById('btn-circulo').classList.add('oculto');
     document.getElementById('modal-fin-juego').classList.remove('oculto');
-    document.getElementById('final-aciertos').innerText = gameState.score;
-    const avg = gameState.score > 0 ? (gameState.reactionSum / gameState.score).toFixed(0) : 0;
+    document.getElementById('final-aciertos').innerText = game.score;
+    document.getElementById('final-fallos').innerText = game.misses;
+    
+    const avg = game.score > 0 ? (game.totalReaction / game.score).toFixed(0) : 0;
     document.getElementById('tiempo-reaccion-estimado').innerText = avg;
 }
