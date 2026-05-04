@@ -3,67 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Reaction Trainer Pro | High Performance Build</title>
+    <title>Reaction Trainer Elite</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Capa de Interfaz de Usuario (HUD) -->
-    <div id="hud-container" class="hidden">
-        <div class="stat-box" id="stat-timer">
-            <span class="label">TIEMPO</span>
-            <span class="value" id="timer-val">01:00</span>
+    <div id="ui-overlay" class="oculto">
+        <div class="indicador" id="timer-box">
+            <span class="etiqueta">TIEMPO</span>
+            <span class="valor" id="reloj">01:00</span>
         </div>
-        <div class="stat-box" id="stat-misses">
-            <span class="label">FALLOS</span>
-            <span class="value" id="misses-val">0</span>
+        <div class="indicador" id="hits-box">
+            <span class="etiqueta">ACIERTOS</span>
+            <span class="valor" id="puntos">0</span>
         </div>
-        <div class="stat-box" id="stat-hits">
-            <span class="label">ACIERTOS</span>
-            <span class="value" id="hits-val">0</span>
-        </div>
-    </div>
-
-    <!-- Objetivo Principal -->
-    <button id="game-target" class="hidden"></button>
-
-    <!-- Modal de Inicio -->
-    <div id="modal-start" class="modal-overlay">
-        <div class="modal-card">
-            <h1 class="glow-text">REACTION PRO</h1>
-            <div class="hardware-info">
-                <p><strong>SISTEMA:</strong> Optimización Ryzen 5 / RX Series</p>
-                <p><strong>ESTADO:</strong> GitHub Pages Link Active</p>
-            </div>
-            <div class="instructions">
-                <p>Haz clic en los objetivos verdes lo más rápido posible.</p>
-                <p>Los clics fallidos penalizan la pantalla.</p>
-            </div>
-            <button id="btn-play-now" class="primary-btn">INICIAR ENTRENAMIENTO</button>
+        <div class="indicador" id="miss-box">
+            <span class="etiqueta">FALLOS</span>
+            <span class="valor" id="fallos">0</span>
         </div>
     </div>
 
-    <!-- Modal de Resultados -->
-    <div id="modal-results" class="modal-overlay hidden">
-        <div class="modal-card">
-            <h2 class="glow-text">RENDIMIENTO FINAL</h2>
-            <div class="results-grid">
-                <div class="res-item">
-                    <span class="res-label">Total Aciertos</span>
-                    <span class="res-value" id="final-hits">0</span>
-                </div>
-                <div class="res-item">
-                    <span class="res-label">Precisión</span>
-                    <span class="res-value" id="final-accuracy">0%</span>
-                </div>
-                <div class="res-item">
-                    <span class="res-label">Reacción Media</span>
-                    <span class="res-value" id="final-ms">0 ms</span>
-                </div>
+    <button id="target-circle" class="oculto"></button>
+
+    <div id="pantalla-inicio" class="overlay-full">
+        <div class="panel-central">
+            <h1 class="texto-glow">REACTION TRAINER</h1>
+            <div class="monitor-hardware">
+                <p>SISTEMA: Ryzen 5 & Radeon RX Series</p>
+                <p>SYNC: GitHub Pages Build v9.5</p>
             </div>
-            <button class="primary-btn" onclick="location.reload()">REINTENTAR</button>
+            <button id="boton-iniciar" class="btn-principal">COMENZAR ENTRENAMIENTO</button>
         </div>
     </div>
 
+    <div id="pantalla-final" class="overlay-full oculto">
+        <div class="panel-central">
+            <h2 class="texto-glow">INFORME FINAL</h2>
+            <div class="grid-resultados">
+                <div class="dato"><span class="label">ACIERTOS</span><span class="res" id="res-aciertos">0</span></div>
+                <div class="dato"><span class="label">REACCIÓN</span><span class="res" id="res-tiempo">0 ms</span></div>
+                <div class="dato"><span class="label">PRECISIÓN</span><span class="res" id="res-precision">0%</span></div>
+            </div>
+            <button class="btn-principal" onclick="location.reload()">REINTENTAR</button>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
