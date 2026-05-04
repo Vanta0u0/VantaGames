@@ -1,32 +1,23 @@
 /**
  * REACTION TRAINER - BLINK EDITION
- * Versión Reforzada: Segmentación Inteligente y Protección de Renderizado
+ * Versión Completa: Restauración de Seguridad + Segmentación PC/Mobile
  */
 
 const MOBILE_BREAKPOINT = 768;
 const PC_INACTIVITY_MS = 1000; 
 const MOBILE_INACTIVITY_MS = 750; 
-const CIRCLE_SIZE_PC = 80;      // Tamaño garantizado para PC
-const CIRCLE_SIZE_MOBILE = 65;  // Tamaño optimizado para móviles
-const MARGEN_SEGURIDAD_UI = 20; 
+const CIRCLE_SIZE_PC = 80;      
+const CIRCLE_SIZE_MOBILE = 65;  
+const MARGEN_SEGURIDAD_UI = 25; // Restaurado: Margen para que no se solape con la UI
 
-let aciertos = 0;
-let fallos = 0;
-let movementTimerId = null; 
-let countdownTimerId = null; 
-let tiempoRestante = 60; 
-let juegoActivo = false; 
-const RETRASO_INICIO = 1000;
-
+let aciertos = 0, fallos = 0, tiempoRestante = 60, juegoActivo = false;
+let movementTimerId = null, countdownTimerId = null, tiempoMovimiento = 0, sumaTiemposReaccion = 0;
 let currentInactivityTime = PC_INACTIVITY_MS; 
 let currentSize = CIRCLE_SIZE_PC; 
-let tiempoMovimiento = 0;
-let sumaTiemposReaccion = 0;
 
 const COLOR_ACENTO = '#00FFC0';
 const COLOR_VERDE_MOVIMIENTO = '#00CC00'; 
-const COLOR_AZUL_CELEBRACION_FLASH = 'rgba(0, 191, 255, 0.5)';
-const COLOR_FONDO_FALLO = 'rgba(255, 0, 0, 0.5)';
+const COLOR_AZUL_FLASH = 'rgba(0, 191, 255, 0.5)';
 const COLOR_FONDO_BASE = '#121212'; 
 
 let audioCtx = null;
@@ -43,7 +34,7 @@ function sonarBlink(frecuencia, tipo, duracion) {
         gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duracion);
         osc.connect(gain); gain.connect(audioCtx.destination);
         osc.start(); osc.stop(audioCtx.currentTime + duracion);
-    } catch (e) { console.log("Audio waiting..."); }
+    } catch (e) { }
 }
 
 function calcularTiempoReaccionPromedio() {
@@ -52,36 +43,30 @@ function calcularTiempoReaccionPromedio() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const modalInicio = document.getElementById('modal-inicio-juego');
-    const btnIniciar = document.getElementById('btn-iniciar');
-    const conteoAciertos = document.getElementById('conteo-aciertos');
-    const conteoFallosExt = document.getElementById('conteo-fallos-exterior');
-    const temporizadorDisplay = document.getElementById('temporizador');
-    const botonCirculo = document.getElementById('btn-circulo'); 
-    const mainContainer = document.getElementById('main-container'); 
-    const modalFin = document.getElementById('modal-fin-juego');
-    const modalContenidoFin = document.querySelector('#modal-fin-juego .modal-contenido'); 
-    const finalAciertos = document.getElementById('final-aciertos');
-    const finalFallos = document.getElementById('final-fallos');
-    const btnReiniciar = document.getElementById('btn-reiniciar');
-    const tiempoReaccionDisplay = document.getElementById('tiempo-reaccion-estimado');
+    const gridInicio = document.getElementById('grid-inicio');
+    const botonCirculo = document.getElementById('btn-circulo');
+    const elementosUI = [
+        document.getElementById('temporizador'),
+        document.getElementById('conteo-fallos-exterior'),
+        document.getElementById('conteo-aciertos')
+    ];
 
-    const elementosUI = [temporizadorDisplay, conteoFallosExt, conteoAciertos];
-
-    // MODIFICACIÓN: Segmentación real de hardware
     function aplicarAjusteDispositivo() {
-        if (window.innerWidth <= MOBILE_BREAKPOINT) {
+        const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+        if (isMobile) {
             currentInactivityTime = MOBILE_INACTIVITY_MS;
             currentSize = CIRCLE_SIZE_MOBILE;
+            gridInicio?.classList.replace('pc-layout', 'mobile-layout') || gridInicio?.classList.add('mobile-layout');
         } else {
             currentInactivityTime = PC_INACTIVITY_MS;
             currentSize = CIRCLE_SIZE_PC;
+            gridInicio?.classList.replace('mobile-layout', 'pc-layout') || gridInicio?.classList.add('pc-layout');
         }
-        // Forzado de tamaño visual para resolver el bug de PC
         botonCirculo.style.setProperty('width', currentSize + 'px', 'important');
         botonCirculo.style.setProperty('height', currentSize + 'px', 'important');
     }
 
+    // LINEAS RESTAURADAS: Sistema de colisión con la interfaz
     function obtenerZonasProhibidas() {
         const zonas = [];
         elementosUI.forEach(el => {
@@ -98,18 +83,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return zonas;
     }
 
-    function colisionaConUI(x, y, radioCirculo, zonasProhibidas) {
-        const rectCirculo = {
-            top: y,
-            bottom: y + (radioCirculo * 2),
-            left: x,
-            right: x + (radioCirculo * 2)
-        };
-        for (const zona of zonasProhibidas) {
-            if (rectCirculo.left < zona.right && rectCirculo.right > zona.left &&
-                rectCirculo.top < zona.bottom && rectCirculo.bottom > zona.top) {
-                return true;
-            }
+    function colisionaConUI(x, y, radio, zonas) {
+        const rectC = { top: y, bottom: y + (radio * 2), left: x, right: x + (radio * 2) };
+        for (const z of zonas) {
+            if (rectC.left < z.right && rectC.right > z.left && rectC.top < z.bottom && rectC.bottom > z.top) return true;
         }
         return false;
     }
@@ -119,15 +96,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const radio = currentSize / 2;
         const xMax = window.innerWidth - currentSize;
         const yMax = window.innerHeight - currentSize;
-        const zonasProhibidas = obtenerZonasProhibidas();
+        const zonas = obtenerZonasProhibidas();
         
-        let nuevoX, nuevoY, posicionSegura = false, intentos = 0;
-        while (!posicionSegura && intentos < 50) {
+        let nuevoX, nuevoY, seguro = false, intentos = 0;
+        while (!seguro && intentos < 50) {
             nuevoX = Math.floor(Math.random() * Math.max(0, xMax));
             nuevoY = Math.floor(Math.random() * Math.max(0, yMax));
-            if (!colisionaConUI(nuevoX, nuevoY, radio, zonasProhibidas)) posicionSegura = true;
+            if (!colisionaConUI(nuevoX, nuevoY, radio, zonas)) seguro = true;
             intentos++;
         }
+
         botonCirculo.style.left = `${nuevoX}px`;
         botonCirculo.style.top = `${nuevoY}px`;
         sonarBlink(600, 'sine', 0.1);
@@ -144,65 +122,64 @@ document.addEventListener('DOMContentLoaded', function() {
         }, currentInactivityTime);
     }
 
+    function iniciarJuego() {
+        aplicarAjusteDispositivo();
+        aciertos = 0; fallos = 0; tiempoRestante = 60; sumaTiemposReaccion = 0;
+        document.getElementById('modal-inicio-juego').classList.add('oculto');
+        [document.getElementById('main-container'), botonCirculo, ...elementosUI].forEach(el => el?.classList.remove('oculto'));
+        
+        countdownTimerId = setInterval(() => {
+            if (tiempoRestante > 0) {
+                tiempoRestante--;
+                document.getElementById('temporizador').textContent = `0:${tiempoRestante < 10 ? '0'+tiempoRestante : tiempoRestante}`;
+            } else { finalizarJuego(); }
+        }, 1000);
+        setTimeout(() => { juegoActivo = true; moverCirculoAleatoriamente(); resetMovementTimer(); }, 1000);
+    }
+
     function finalizarJuego() {
         juegoActivo = false;
         clearInterval(countdownTimerId);
         clearTimeout(movementTimerId);
         botonCirculo.classList.add('oculto');
         const trFinal = calcularTiempoReaccionPromedio();
-        if (parseFloat(trFinal) <= 90.00 && aciertos > 0) {
-            modalContenidoFin.innerHTML = `<div class="tr-extrema-container"><h2>¡TIEMPO EXTREMO!</h2><p style="font-size: 2.5em; font-weight: bold;">${trFinal} ms</p><p>Recarga para volver a intentar.</p></div>`;
-            modalFin.style.pointerEvents = 'none';
-        } else {
-            finalAciertos.textContent = aciertos;
-            finalFallos.textContent = fallos;
-            tiempoReaccionDisplay.textContent = `${trFinal} ms`;
-        }
-        modalFin.classList.remove('oculto');
-    }
-
-    function iniciarJuego() {
-        aplicarAjusteDispositivo(); // Refuerzo de tamaño al arrancar
-        aciertos = 0; fallos = 0; tiempoRestante = 60; sumaTiemposReaccion = 0;
-        modalInicio.classList.add('oculto');
-        [mainContainer, botonCirculo, conteoAciertos, conteoFallosExt, temporizadorDisplay].forEach(el => el?.classList.remove('oculto'));
         
-        countdownTimerId = setInterval(() => {
-            if (tiempoRestante > 0) { 
-                tiempoRestante--; 
-                const min = Math.floor(tiempoRestante / 60);
-                const seg = tiempoRestante % 60;
-                temporizadorDisplay.textContent = `${min}:${seg < 10 ? '0'+seg : seg}`;
-            } else { finalizarJuego(); }
-        }, 1000);
-        setTimeout(() => { juegoActivo = true; moverCirculoAleatoriamente(); resetMovementTimer(); }, RETRASO_INICIO);
+        // LINEAS RESTAURADAS: Lógica de Tiempo Extremo
+        if (parseFloat(trFinal) <= 90.00 && aciertos > 0) {
+            const modCont = document.querySelector('#modal-fin-juego .modal-contenido');
+            modCont.innerHTML = `<div class="tr-extrema"><h2>¡TIEMPO EXTREMO!</h2><p style="font-size:3em;">${trFinal} ms</p><p>Refresca para volver a intentar.</p></div>`;
+        } else {
+            document.getElementById('final-aciertos').textContent = aciertos;
+            document.getElementById('final-fallos').textContent = fallos;
+            document.getElementById('tiempo-reaccion-estimado').textContent = `${trFinal} ms`;
+        }
+        document.getElementById('modal-fin-juego').classList.remove('oculto');
     }
 
-    btnIniciar.onclick = () => { sonarBlink(440, 'sine', 0.1); iniciarJuego(); };
+    document.getElementById('btn-iniciar').onclick = () => { sonarBlink(440, 'sine', 0.1); iniciarJuego(); };
     botonCirculo.onclick = (e) => {
         if (!juegoActivo) return;
-        e.stopPropagation(); 
+        e.stopPropagation();
         sumaTiemposReaccion += (performance.now() - tiempoMovimiento);
         aciertos++;
-        conteoAciertos.textContent = `Aciertos: ${aciertos}`;
+        document.getElementById('conteo-aciertos').textContent = `Aciertos: ${aciertos}`;
         sonarBlink(880, 'sine', 0.1);
-        botonCirculo.style.backgroundColor = COLOR_VERDE_MOVIMIENTO;
-        if (aciertos % 25 === 0) document.body.style.backgroundColor = COLOR_AZUL_CELEBRACION_FLASH;
-        setTimeout(() => { botonCirculo.style.backgroundColor = COLOR_ACENTO; document.body.style.backgroundColor = COLOR_FONDO_BASE; }, 100);
+        if (aciertos % 25 === 0) {
+            document.body.style.backgroundColor = COLOR_AZUL_FLASH;
+            setTimeout(() => document.body.style.backgroundColor = COLOR_FONDO_BASE, 100);
+        }
         moverCirculoAleatoriamente(); resetMovementTimer();
     };
 
     document.body.onclick = (e) => {
-        if (!juegoActivo || e.target.id === 'btn-circulo' || e.target.closest('#grid-inicio')) return;
+        if (!juegoActivo || e.target.id === 'btn-circulo') return;
         fallos++;
-        conteoFallosExt.textContent = `Fallos Totales: ${fallos}`;
+        document.getElementById('conteo-fallos-exterior').textContent = `Fallos Totales: ${fallos}`;
         sonarBlink(200, 'square', 0.15);
-        document.body.style.backgroundColor = COLOR_FONDO_FALLO;
+        document.body.style.backgroundColor = 'rgba(255, 0, 0, 0.4)';
         setTimeout(() => document.body.style.backgroundColor = COLOR_FONDO_BASE, 150);
-        moverCirculoAleatoriamente(); resetMovementTimer();
     };
 
-    if (btnReiniciar) btnReiniciar.onclick = () => location.reload();
     aplicarAjusteDispositivo();
     window.addEventListener('resize', aplicarAjusteDispositivo);
 });
