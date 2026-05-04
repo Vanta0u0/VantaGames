@@ -1,12 +1,13 @@
 /**
  * REACTION TRAINER - BLINK EDITION
- * Versión: Inteligencia de Evitación de Interfaz (UI Avoidance)
+ * Versión Reforzada: Segmentación Inteligente y Protección de Renderizado
  */
 
 const MOBILE_BREAKPOINT = 768;
 const PC_INACTIVITY_MS = 1000; 
 const MOBILE_INACTIVITY_MS = 750; 
-const CIRCLE_SIZE_BASE_PX = 80;
+const CIRCLE_SIZE_PC = 80;      // Tamaño garantizado para PC
+const CIRCLE_SIZE_MOBILE = 65;  // Tamaño optimizado para móviles
 const MARGEN_SEGURIDAD_UI = 20; 
 
 let aciertos = 0;
@@ -18,6 +19,7 @@ let juegoActivo = false;
 const RETRASO_INICIO = 1000;
 
 let currentInactivityTime = PC_INACTIVITY_MS; 
+let currentSize = CIRCLE_SIZE_PC; 
 let tiempoMovimiento = 0;
 let sumaTiemposReaccion = 0;
 
@@ -26,8 +28,6 @@ const COLOR_VERDE_MOVIMIENTO = '#00CC00';
 const COLOR_AZUL_CELEBRACION_FLASH = 'rgba(0, 191, 255, 0.5)';
 const COLOR_FONDO_FALLO = 'rgba(255, 0, 0, 0.5)';
 const COLOR_FONDO_BASE = '#121212'; 
-const SHADOW_ACENTO = '0 0 15px ' + COLOR_ACENTO;
-const SHADOW_VERDE = '0 0 15px ' + COLOR_VERDE_MOVIMIENTO;
 
 let audioCtx = null;
 
@@ -68,25 +68,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const elementosUI = [temporizadorDisplay, conteoFallosExt, conteoAciertos];
 
-    function aplicarAjusteMovil() {
+    // MODIFICACIÓN: Segmentación real de hardware
+    function aplicarAjusteDispositivo() {
         if (window.innerWidth <= MOBILE_BREAKPOINT) {
             currentInactivityTime = MOBILE_INACTIVITY_MS;
+            currentSize = CIRCLE_SIZE_MOBILE;
         } else {
             currentInactivityTime = PC_INACTIVITY_MS;
+            currentSize = CIRCLE_SIZE_PC;
         }
-    }
-
-    function actualizarTemporizadorDisplay() {
-        const min = Math.floor(tiempoRestante / 60);
-        const seg = tiempoRestante % 60;
-        temporizadorDisplay.textContent = `${min}:${seg < 10 ? '0'+seg : seg}`;
-        if (tiempoRestante <= 10) {
-            temporizadorDisplay.style.color = '#FF4136';
-            temporizadorDisplay.style.borderColor = '#FF4136';
-        } else {
-            temporizadorDisplay.style.color = '#FFFFFF';
-            temporizadorDisplay.style.borderColor = '#FFFFFF';
-        }
+        // Forzado de tamaño visual para resolver el bug de PC
+        botonCirculo.style.setProperty('width', currentSize + 'px', 'important');
+        botonCirculo.style.setProperty('height', currentSize + 'px', 'important');
     }
 
     function obtenerZonasProhibidas() {
@@ -113,10 +106,8 @@ document.addEventListener('DOMContentLoaded', function() {
             right: x + (radioCirculo * 2)
         };
         for (const zona of zonasProhibidas) {
-            if (rectCirculo.left < zona.right &&
-                rectCirculo.right > zona.left &&
-                rectCirculo.top < zona.bottom &&
-                rectCirculo.bottom > zona.top) {
+            if (rectCirculo.left < zona.right && rectCirculo.right > zona.left &&
+                rectCirculo.top < zona.bottom && rectCirculo.bottom > zona.top) {
                 return true;
             }
         }
@@ -125,11 +116,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function moverCirculoAleatoriamente() {
         if (!juegoActivo) return;
-        const anchoCirculo = botonCirculo.offsetWidth || CIRCLE_SIZE_BASE_PX;
-        const altoCirculo = botonCirculo.offsetHeight || CIRCLE_SIZE_BASE_PX;
-        const radio = anchoCirculo / 2;
-        const xMax = window.innerWidth - anchoCirculo;
-        const yMax = window.innerHeight - altoCirculo;
+        const radio = currentSize / 2;
+        const xMax = window.innerWidth - currentSize;
+        const yMax = window.innerHeight - currentSize;
         const zonasProhibidas = obtenerZonasProhibidas();
         
         let nuevoX, nuevoY, posicionSegura = false, intentos = 0;
@@ -173,17 +162,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function iniciarJuego() {
+        aplicarAjusteDispositivo(); // Refuerzo de tamaño al arrancar
         aciertos = 0; fallos = 0; tiempoRestante = 60; sumaTiemposReaccion = 0;
-        
-        // CORRECCIÓN: Asegurar tamaño del círculo al iniciar
-        botonCirculo.style.width = CIRCLE_SIZE_BASE_PX + 'px';
-        botonCirculo.style.height = CIRCLE_SIZE_BASE_PX + 'px';
-
         modalInicio.classList.add('oculto');
         [mainContainer, botonCirculo, conteoAciertos, conteoFallosExt, temporizadorDisplay].forEach(el => el?.classList.remove('oculto'));
-        actualizarTemporizadorDisplay();
+        
         countdownTimerId = setInterval(() => {
-            if (tiempoRestante > 0) { tiempoRestante--; actualizarTemporizadorDisplay(); } else { finalizarJuego(); }
+            if (tiempoRestante > 0) { 
+                tiempoRestante--; 
+                const min = Math.floor(tiempoRestante / 60);
+                const seg = tiempoRestante % 60;
+                temporizadorDisplay.textContent = `${min}:${seg < 10 ? '0'+seg : seg}`;
+            } else { finalizarJuego(); }
         }, 1000);
         setTimeout(() => { juegoActivo = true; moverCirculoAleatoriamente(); resetMovementTimer(); }, RETRASO_INICIO);
     }
@@ -206,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!juegoActivo || e.target.id === 'btn-circulo' || e.target.closest('#grid-inicio')) return;
         fallos++;
         conteoFallosExt.textContent = `Fallos Totales: ${fallos}`;
-        document.getElementById('conteo-fallos').textContent = `Fallos: ${fallos}`;
         sonarBlink(200, 'square', 0.15);
         document.body.style.backgroundColor = COLOR_FONDO_FALLO;
         setTimeout(() => document.body.style.backgroundColor = COLOR_FONDO_BASE, 150);
@@ -214,6 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     if (btnReiniciar) btnReiniciar.onclick = () => location.reload();
-    aplicarAjusteMovil();
-    window.addEventListener('resize', aplicarAjusteMovil);
+    aplicarAjusteDispositivo();
+    window.addEventListener('resize', aplicarAjusteDispositivo);
 });
