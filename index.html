@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Reaction Trainer Pro</title>
+    <title>Reaction Trainer Pro - Master Build</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Contenedores de Información -->
+    <!-- Capa de Información y HUD -->
     <div id="ui-container">
         <div id="temporizador" class="oculto">0:60</div>
         <div id="conteo-fallos-exterior" class="oculto">Fallos: 0</div>
@@ -17,29 +17,30 @@
     <!-- Objetivo del Juego -->
     <button id="btn-circulo" class="oculto"></button>
 
-    <!-- Menú Principal -->
+    <!-- Menú de Inicio -->
     <div id="modal-inicio-juego">
         <div class="modal-contenido">
             <h1 class="titulo-neon">REACTION TRAINER</h1>
-            <div id="grid-inicio" class="pc-layout">
+            <div id="grid-inicio">
                 <div class="modal-columna">
-                    <h3>OBJETIVO</h3>
-                    <p>Haz clic en el círculo verde lo más rápido que puedas.</p>
+                    <h3>ENTRENAMIENTO</h3>
+                    <p>Haz clic en el círculo verde. Evita los clics en el fondo para no penalizar.</p>
                 </div>
                 <div class="modal-columna">
-                    <h3>HARDWARE</h3>
-                    <p>Detección automática de latencia y periféricos activa.</p>
+                    <h3>RENDIMIENTO</h3>
+                    <p>Modo de baja latencia activo para Ryzen 5 / Radeon RX.</p>
                 </div>
             </div>
             <button id="btn-iniciar">COMENZAR PRUEBA</button>
         </div>
     </div>
 
-    <!-- Resultados -->
+    <!-- Pantalla de Resultados -->
     <div id="modal-fin-juego" class="oculto">
         <div class="modal-contenido">
-            <h2>SESIÓN COMPLETADA</h2>
+            <h2>SESIÓN FINALIZADA</h2>
             <p>Aciertos Totales: <span id="final-aciertos">0</span></p>
+            <p>Fallos cometidos: <span id="final-fallos">0</span></p>
             <p>Velocidad Media: <span id="tiempo-reaccion-estimado">0</span> ms</p>
             <button onclick="location.reload()">REINTENTAR</button>
         </div>
