@@ -1,123 +1,85 @@
 :root {
-    --color-fondo: #121212;
-    --color-acento: #00FFC0;
-    --color-fallo: #FF4136;
-    --color-panel: #1a1a1a;
+    --acento: #00FFC0;
+    --fondo: #0a0a0a;
 }
 
 body {
-    background-color: var(--color-fondo);
-    color: #E0E0E0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--fondo);
+    color: #fff;
     margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
     overflow: hidden;
     user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    transition: background-color 0.15s ease;
 }
 
-/* --- CLASES DE SEGMENTACIÓN (Controladas por JS) --- */
-
-/* Diseño para Computadoras (Monitor) */
+/* --- CLASES DE SEGMENTACIÓN --- */
 .pc-layout {
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    gap: 30px;
-    margin: 30px 0;
+    gap: 25px;
+    margin: 25px 0;
 }
 
-.pc-layout .modal-columna {
-    flex: 1;
-    border: 2px solid var(--color-acento);
-    padding: 25px;
-    background: rgba(255, 255, 255, 0.03);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.pc-layout .modal-columna:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(0, 255, 192, 0.2);
-}
-
-/* Diseño para Celulares/Tablets */
 .mobile-layout {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin: 20px 0;
+    gap: 12px;
 }
 
-.mobile-layout .modal-columna {
-    width: 90%;
-    margin: 0 auto;
-    border: 1px solid var(--color-acento);
-    padding: 15px;
-    font-size: 0.9em;
+.modal-columna {
+    flex: 1;
+    border: 2px solid var(--acento);
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
 }
 
 /* --- ELEMENTOS DE JUEGO --- */
-
 #btn-circulo {
     position: fixed !important;
+    background-color: var(--acento);
+    box-shadow: 0 0 25px var(--acento);
     border-radius: 50%;
-    background-color: var(--color-acento);
-    box-shadow: 0 0 20px var(--color-acento);
     border: none;
     cursor: pointer;
-    z-index: 9999;
+    z-index: 5000;
+    transition: transform 0.05s;
 }
+
+#btn-circulo:active { transform: scale(0.9); }
 
 .oculto { display: none !important; }
 
 #temporizador, #conteo-aciertos, #conteo-fallos-exterior {
     position: fixed;
-    padding: 12px;
-    background: var(--color-panel);
-    border-radius: 8px;
+    background: #151515;
+    padding: 12px 20px;
+    border: 1px solid var(--acento);
     font-weight: bold;
-    z-index: 1000;
+    border-radius: 4px;
+    z-index: 6000;
 }
 
-#temporizador { top: 20px; left: 20px; border: 1px solid #FFF; }
-#conteo-fallos-exterior { top: 20px; right: 20px; border: 1px solid var(--color-fallo); color: var(--color-fallo); }
-#conteo-aciertos { top: 85px; right: 20px; border: 1px solid var(--color-acento); color: var(--color-acento); }
-
-/* Animación de parpadeo al aparecer */
-@keyframes pulse-blink {
-    0% { transform: scale(0.8); opacity: 0.5; }
-    100% { transform: scale(1); opacity: 1; }
-}
-.blink-active { animation: pulse-blink 0.1s ease-out; }
-
-/* Modal de inicio/fin */
-#modal-inicio-juego, #modal-fin-juego {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.9);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 3000;
-}
+#temporizador { top: 15px; left: 15px; }
+#conteo-fallos-exterior { top: 15px; right: 15px; color: #ff5555; border-color: #ff5555; }
+#conteo-aciertos { top: 75px; right: 15px; }
 
 .modal-contenido {
-    background: var(--color-panel);
-    border: 2px solid var(--color-acento);
+    background: #111;
+    border: 3px solid var(--acento);
     padding: 40px;
     text-align: center;
+    max-width: 600px;
     border-radius: 15px;
-    max-width: 800px;
 }
 
-#btn-iniciar, #btn-reiniciar {
-    background: var(--color-acento);
+#btn-iniciar {
+    background: var(--acento);
     color: #000;
     border: none;
-    padding: 15px 40px;
-    font-size: 1.2em;
+    padding: 15px 45px;
+    font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
-    border-radius: 5px;
     margin-top: 20px;
 }
