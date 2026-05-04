@@ -1,74 +1,123 @@
 :root {
-    --color-fondo: #121212; 
-    --color-texto-claro: #E0E0E0; 
-    --color-acento: #00FFC0; 
-    --color-fallo: #FF4136; 
-    --color-fondo-columna: #1a1a1a; 
+    --color-fondo: #121212;
+    --color-acento: #00FFC0;
+    --color-fallo: #FF4136;
+    --color-panel: #1a1a1a;
 }
 
 body {
-    background-color: var(--color-fondo); 
-    font-family: 'Arial', sans-serif;
-    color: var(--color-texto-claro); 
+    background-color: var(--color-fondo);
+    color: #E0E0E0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
-    min-height: 100vh;
-    transition: background-color 0.15s ease-out; 
     overflow: hidden;
-    user-select: none; /* Evita selección de texto en PC */
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.15s ease;
 }
 
-/* MODIFICACIÓN: Estilo blindado para el círculo */
+/* --- CLASES DE SEGMENTACIÓN (Controladas por JS) --- */
+
+/* Diseño para Computadoras (Monitor) */
+.pc-layout {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.pc-layout .modal-columna {
+    flex: 1;
+    border: 2px solid var(--color-acento);
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pc-layout .modal-columna:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 192, 0.2);
+}
+
+/* Diseño para Celulares/Tablets */
+.mobile-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.mobile-layout .modal-columna {
+    width: 90%;
+    margin: 0 auto;
+    border: 1px solid var(--color-acento);
+    padding: 15px;
+    font-size: 0.9em;
+}
+
+/* --- ELEMENTOS DE JUEGO --- */
+
 #btn-circulo {
     position: fixed !important;
     border-radius: 50%;
-    background-color: var(--color-acento); 
+    background-color: var(--color-acento);
+    box-shadow: 0 0 20px var(--color-acento);
     border: none;
     cursor: pointer;
-    z-index: 9999; /* Siempre arriba */
-    box-shadow: 0 0 15px var(--color-acento);
-    display: block;
-    /* Los tamaños se controlan por JS para máxima precisión */
+    z-index: 9999;
 }
-
-#main-container { 
-    width: 80%; 
-    max-width: 700px; 
-    padding: 40px; 
-    border: 1px solid var(--color-acento); 
-    box-shadow: 0 0 50px rgba(0, 255, 192, 0.15); 
-    border-radius: 10px; 
-    background-color: var(--color-fondo-columna); 
-    margin: 50px auto; 
-    text-align: center; 
-    position: relative; 
-    z-index: 100; 
-    pointer-events: none; 
-}
-
-#conteo-fallos-exterior, #conteo-aciertos, #temporizador {
-    position: fixed;
-    padding: 10px;
-    font-size: 1.2em;
-    background-color: var(--color-fondo-columna);
-    border-radius: 5px;
-    z-index: 1000;
-}
-
-#temporizador { top: 20px; left: 20px; border: 1px solid #FFFFFF; color: #FFFFFF; }
-#conteo-fallos-exterior { top: 20px; right: 20px; border: 1px solid var(--color-fallo); color: var(--color-fallo); }
-#conteo-aciertos { top: 80px; right: 20px; border: 1px solid var(--color-acento); color: var(--color-acento); }
 
 .oculto { display: none !important; }
 
-/* Mantener tus modales y animaciones originales intactas */
-#modal-inicio-juego, #modal-fin-juego { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-#modal-inicio-juego { background-color: rgba(0, 0, 0, 0.95); z-index: 3000; }
-#modal-fin-juego { background-color: rgba(0, 0, 0, 0.9); z-index: 2000; }
-.modal-contenido, .modal-columna { background-color: var(--color-fondo-columna); border: 2px solid var(--color-acento); border-radius: 10px; padding: 25px; text-align: center; }
-
-@keyframes pulse-blink {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+#temporizador, #conteo-aciertos, #conteo-fallos-exterior {
+    position: fixed;
+    padding: 12px;
+    background: var(--color-panel);
+    border-radius: 8px;
+    font-weight: bold;
+    z-index: 1000;
 }
-.blink-active { animation: pulse-blink 0.1s ease-in-out; }
+
+#temporizador { top: 20px; left: 20px; border: 1px solid #FFF; }
+#conteo-fallos-exterior { top: 20px; right: 20px; border: 1px solid var(--color-fallo); color: var(--color-fallo); }
+#conteo-aciertos { top: 85px; right: 20px; border: 1px solid var(--color-acento); color: var(--color-acento); }
+
+/* Animación de parpadeo al aparecer */
+@keyframes pulse-blink {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.blink-active { animation: pulse-blink 0.1s ease-out; }
+
+/* Modal de inicio/fin */
+#modal-inicio-juego, #modal-fin-juego {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+.modal-contenido {
+    background: var(--color-panel);
+    border: 2px solid var(--color-acento);
+    padding: 40px;
+    text-align: center;
+    border-radius: 15px;
+    max-width: 800px;
+}
+
+#btn-iniciar, #btn-reiniciar {
+    background: var(--color-acento);
+    color: #000;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+}
