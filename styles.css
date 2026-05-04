@@ -1,23 +1,20 @@
-/* CONFIGURACIÓN BASE Y RESET */
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
     user-select: none;
 }
 
 :root {
-    --primary: #00FFC0;
-    --danger: #FF4136;
-    --bg-dark: #0a0a0a;
-    --surface: #111111;
-    --text: #ffffff;
+    --neon: #00FFC0;
+    --red: #FF4136;
+    --bg: #0a0a0a;
 }
 
 body {
-    background-color: var(--bg-dark);
-    color: var(--text);
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
@@ -26,104 +23,104 @@ body {
     align-items: center;
 }
 
-/* INTERFAZ HUD */
-#hud-container {
+#ui-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 1000;
+    z-index: 100;
 }
 
-.stat-box {
+.indicador {
     position: absolute;
-    background: var(--surface);
-    border: 1px solid var(--primary);
-    padding: 10px 20px;
-    border-radius: 8px;
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid var(--neon);
+    padding: 12px 20px;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 100px;
-    pointer-events: auto;
+    backdrop-filter: blur(10px);
 }
 
-.stat-box .label { font-size: 0.7rem; color: var(--primary); font-weight: bold; }
-.stat-box .value { font-size: 1.4rem; font-weight: 800; }
+#timer-box { top: 20px; left: 20px; }
+#hits-box { top: 100px; right: 20px; }
+#miss-box { top: 20px; right: 20px; border-color: var(--red); }
 
-/* LINEA 46: UBICACIONES DE LOS MARCADORES */
-#stat-timer { top: 20px; left: 20px; }
-#stat-misses { top: 20px; right: 20px; border-color: var(--danger); }
-#stat-misses .label { color: var(--danger); }
-#stat-hits { top: 100px; right: 20px; }
+.etiqueta { font-size: 0.6rem; color: var(--neon); font-weight: bold; }
+#miss-box .etiqueta { color: var(--red); }
+.valor { font-size: 1.5rem; font-weight: 900; }
 
-/* OBJETIVO */
-#game-target {
+#target-circle {
     position: absolute !important;
-    background-color: var(--primary);
-    box-shadow: 0 0 25px var(--primary);
-    border: none;
+    background-color: var(--neon);
+    box-shadow: 0 0 25px var(--neon);
     border-radius: 50%;
+    border: none;
     cursor: pointer;
-    z-index: 500;
-    transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 50;
+    transition: transform 0.05s;
 }
 
-#game-target:active { transform: scale(0.8); }
-
-/* MODALES */
-.modal-overlay {
+.overlay-full {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 0.98);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000;
-    backdrop-filter: blur(5px);
+    z-index: 1000;
 }
 
-.modal-card {
-    background: var(--surface);
-    border: 2px solid var(--primary);
+.panel-central {
+    background: #111;
+    border: 2px solid var(--neon);
     padding: 40px;
     border-radius: 20px;
     text-align: center;
-    max-width: 500px;
     width: 90%;
+    max-width: 500px;
 }
 
-.glow-text {
-    color: var(--primary);
-    text-shadow: 0 0 15px var(--primary);
-    margin-bottom: 20px;
+.texto-glow {
+    color: var(--neon);
+    text-shadow: 0 0 15px var(--neon);
     font-size: 2.5rem;
+    margin-bottom: 20px;
 }
 
-.hardware-info {
-    background: #1a1a1a;
+.monitor-hardware {
+    background: #181818;
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 20px;
-    font-size: 0.85rem;
-    color: #888;
+    font-size: 0.8rem;
+    color: #666;
+    border-left: 4px solid var(--neon);
 }
 
-.primary-btn {
-    background: var(--primary);
-    color: #000;
+.btn-principal {
+    background: var(--neon);
+    color: black;
     border: none;
     padding: 15px 40px;
     font-size: 1.1rem;
-    font-weight: bold;
-    border-radius: 8px;
+    font-weight: 900;
+    border-radius: 10px;
     cursor: pointer;
-    transition: filter 0.2s;
 }
 
-.primary-btn:hover { filter: brightness(1.2); }
+.grid-resultados {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 30px;
+}
 
-/* UTILIDADES */
-.hidden { display: none !important; }
+.dato { background: #1a1a1a; padding: 10px; border-radius: 8px; }
+.dato .label { display: block; font-size: 0.6rem; color: #888; }
+.dato .res { font-size: 1.1rem; font-weight: bold; }
+
+.oculto { display: none !important; }
