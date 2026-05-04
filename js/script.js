@@ -174,6 +174,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function iniciarJuego() {
         aciertos = 0; fallos = 0; tiempoRestante = 60; sumaTiemposReaccion = 0;
+        
+        // CORRECCIÓN: Asegurar tamaño del círculo al iniciar
+        botonCirculo.style.width = CIRCLE_SIZE_BASE_PX + 'px';
+        botonCirculo.style.height = CIRCLE_SIZE_BASE_PX + 'px';
+
         modalInicio.classList.add('oculto');
         [mainContainer, botonCirculo, conteoAciertos, conteoFallosExt, temporizadorDisplay].forEach(el => el?.classList.remove('oculto'));
         actualizarTemporizadorDisplay();
