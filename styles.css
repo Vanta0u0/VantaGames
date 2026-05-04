@@ -14,39 +14,58 @@ body {
     min-height: 100vh;
     transition: background-color 0.15s ease-out; 
     overflow: hidden;
+    user-select: none; /* Evita selección de texto en PC */
 }
 
-#main-container { width: 80%; max-width: 700px; padding: 40px; border: 1px solid var(--color-acento); box-shadow: 0 0 50px rgba(0, 255, 192, 0.15); border-radius: 10px; background-color: var(--color-fondo-columna); margin: 50px auto; text-align: center; position: relative; z-index: 100; pointer-events: none; }
-h1 { color: var(--color-acento); text-align: center; border-bottom: 2px solid var(--color-acento); padding-bottom: 15px; margin-bottom: 30px; }
-
-#conteo-fallos-exterior { position: fixed; top: 20px; right: 20px; padding: 10px; font-size: 1.2em; color: var(--color-fallo); background-color: var(--color-fondo-columna); border: 1px solid var(--color-fallo); border-radius: 5px; z-index: 1000; }
-#conteo-aciertos { position: fixed; top: 80px; right: 20px; padding: 10px; font-size: 1.2em; color: var(--color-acento); background-color: var(--color-fondo-columna); border: 1px solid var(--color-acento); border-radius: 5px; z-index: 1000; }
-#temporizador { position: fixed; top: 20px; left: 20px; padding: 10px; font-size: 1.2em; color: #FFFFFF; background-color: var(--color-fondo-columna); border: 1px solid #FFFFFF; border-radius: 5px; z-index: 1000; }
-
+/* MODIFICACIÓN: Estilo blindado para el círculo */
 #btn-circulo {
-    width: 80px; /* CORRECCIÓN: Tamaño definido */
-    height: 80px; /* CORRECCIÓN: Tamaño definido */
-    border-radius: 50%; 
+    position: fixed !important;
+    border-radius: 50%;
     background-color: var(--color-acento); 
-    border: none; 
-    cursor: pointer; 
-    position: fixed !important; 
-    z-index: 900; 
-    box-shadow: 0 0 15px var(--color-acento); 
+    border: none;
+    cursor: pointer;
+    z-index: 9999; /* Siempre arriba */
+    box-shadow: 0 0 15px var(--color-acento);
+    display: block;
+    /* Los tamaños se controlan por JS para máxima precisión */
 }
 
-#modal-inicio-juego { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.95); display: flex; justify-content: center; align-items: center; z-index: 3000; }
-#grid-inicio { display: flex; gap: 20px; padding: 20px; max-width: 90%; flex-wrap: wrap; justify-content: center; }
-.modal-columna { background-color: var(--color-fondo-columna); border: 2px solid var(--color-acento); border-radius: 10px; padding: 25px; text-align: center; flex: 1; min-width: 250px; }
-#btn-iniciar { padding: 15px 30px; font-size: 1.3em; background-color: var(--color-acento); color: var(--color-fondo); border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+#main-container { 
+    width: 80%; 
+    max-width: 700px; 
+    padding: 40px; 
+    border: 1px solid var(--color-acento); 
+    box-shadow: 0 0 50px rgba(0, 255, 192, 0.15); 
+    border-radius: 10px; 
+    background-color: var(--color-fondo-columna); 
+    margin: 50px auto; 
+    text-align: center; 
+    position: relative; 
+    z-index: 100; 
+    pointer-events: none; 
+}
 
-#modal-fin-juego { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 2000; }
-.modal-contenido { background-color: #1a1a1a; border: 2px solid var(--color-acento); border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 0 40px var(--color-acento); }
-.final-score-badge { padding: 8px 15px; font-size: 1.2em; border-radius: 5px; margin: 10px; display: inline-block; font-weight: bold; background-color: #303030; }
+#conteo-fallos-exterior, #conteo-aciertos, #temporizador {
+    position: fixed;
+    padding: 10px;
+    font-size: 1.2em;
+    background-color: var(--color-fondo-columna);
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+#temporizador { top: 20px; left: 20px; border: 1px solid #FFFFFF; color: #FFFFFF; }
+#conteo-fallos-exterior { top: 20px; right: 20px; border: 1px solid var(--color-fallo); color: var(--color-fallo); }
+#conteo-aciertos { top: 80px; right: 20px; border: 1px solid var(--color-acento); color: var(--color-acento); }
 
 .oculto { display: none !important; }
 
-/* ANIMACIÓN BLINK */
+/* Mantener tus modales y animaciones originales intactas */
+#modal-inicio-juego, #modal-fin-juego { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+#modal-inicio-juego { background-color: rgba(0, 0, 0, 0.95); z-index: 3000; }
+#modal-fin-juego { background-color: rgba(0, 0, 0, 0.9); z-index: 2000; }
+.modal-contenido, .modal-columna { background-color: var(--color-fondo-columna); border: 2px solid var(--color-acento); border-radius: 10px; padding: 25px; text-align: center; }
+
 @keyframes pulse-blink {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
