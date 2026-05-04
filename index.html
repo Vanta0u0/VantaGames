@@ -3,48 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Reaction Trainer - Blink Edition</title>
+    <title>Reaction Trainer Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Contenedores de Información -->
+    <div id="ui-container">
+        <div id="temporizador" class="oculto">0:60</div>
+        <div id="conteo-fallos-exterior" class="oculto">Fallos: 0</div>
+        <div id="conteo-aciertos" class="oculto">Aciertos: 0</div>
+    </div>
 
-    <!-- Marcadores de Juego -->
-    <div id="temporizador" class="oculto">0:60</div>
-    <div id="conteo-fallos-exterior" class="oculto">Fallos Totales: 0</div>
-    <div id="conteo-aciertos" class="oculto">Aciertos: 0</div>
-
-    <!-- Círculo de Reacción -->
+    <!-- Objetivo del Juego -->
     <button id="btn-circulo" class="oculto"></button>
 
-    <!-- Contenedor Principal (Decorativo/Fondo) -->
-    <div id="main-container" class="oculto"></div>
-
-    <!-- Pantalla de Inicio (Segmentada por JS) -->
+    <!-- Menú Principal -->
     <div id="modal-inicio-juego">
         <div class="modal-contenido">
             <h1 class="titulo-neon">REACTION TRAINER</h1>
-            <div id="grid-inicio">
+            <div id="grid-inicio" class="pc-layout">
                 <div class="modal-columna">
-                    <h2>INSTRUCCIONES</h2>
-                    <p>Haz clic en el círculo verde antes de que desaparezca o se mueva.</p>
+                    <h3>OBJETIVO</h3>
+                    <p>Haz clic en el círculo verde lo más rápido que puedas.</p>
                 </div>
                 <div class="modal-columna">
-                    <h2>MODO DE JUEGO</h2>
-                    <p>Optimizado para tu hardware actual.</p>
+                    <h3>HARDWARE</h3>
+                    <p>Detección automática de latencia y periféricos activa.</p>
                 </div>
             </div>
             <button id="btn-iniciar">COMENZAR PRUEBA</button>
         </div>
     </div>
 
-    <!-- Pantalla de Resultados -->
+    <!-- Resultados -->
     <div id="modal-fin-juego" class="oculto">
         <div class="modal-contenido">
-            <h2>RESULTADOS FINALES</h2>
-            <p>Aciertos: <span id="final-aciertos">0</span></p>
-            <p>Fallos: <span id="final-fallos">0</span></p>
-            <p>Tiempo de Reacción: <span id="tiempo-reaccion-estimado">0</span></p>
-            <button id="btn-reiniciar">REINTENTAR</button>
+            <h2>SESIÓN COMPLETADA</h2>
+            <p>Aciertos Totales: <span id="final-aciertos">0</span></p>
+            <p>Velocidad Media: <span id="tiempo-reaccion-estimado">0</span> ms</p>
+            <button onclick="location.reload()">REINTENTAR</button>
         </div>
     </div>
 
